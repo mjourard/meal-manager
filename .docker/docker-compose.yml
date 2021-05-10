@@ -1,0 +1,15 @@
+version: '3.5'
+
+services:
+  db.mealmanager:
+    image: 'postgres:13.1-alpine'
+    container_name: mm-db
+    environment:
+      - POSTGRES_USER=compose-postgres
+      - POSTGRES_PASSWORD=compose-postgres
+  hoster:
+    container_name: hoster
+    image: dvdarias/docker-hoster
+    volumes:
+      - /etc/hosts:/tmp/hosts
+      - /run/docker.sock:/tmp/docker.sock
