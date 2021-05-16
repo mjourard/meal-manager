@@ -1,7 +1,8 @@
-import React, { Component } from "react";
-import RecipesDataService from "../services/recipes.service";
+import React, {Component} from "react";
+import RecipesDataService from "../../services/recipes.service";
+import RecipeForm from "../recipe-form.component";
 
-export default class Recipe extends Component {
+export default class EditRecipe extends Component {
     constructor(props) {
         super(props);
         this.onChangeName = this.onChangeName.bind(this);
@@ -26,21 +27,16 @@ export default class Recipe extends Component {
         this.getRecipe(this.props.match.params.id);
     }
 
-    onChangeName(e) {
-        const name = e.target.value;
-        this.setState(function(prevState) {
-            return {
-                currentRecipe: {
-                    ...prevState.currentRecipe,
-                    name: name
-                }
-            };
-        });
+    onChangeName(name) {
+        this.setState(prevState => ({
+            currentRecipe: {
+                ...prevState.currentRecipe,
+                name: name
+            }
+        }));
     }
 
-    onChangeDescription(e) {
-        const description = e.target.value;
-
+    onChangeDescription(description) {
         this.setState(prevState => ({
             currentRecipe: {
                 ...prevState.currentRecipe,
@@ -49,9 +45,7 @@ export default class Recipe extends Component {
         }));
     }
 
-    onChangeRecipeURL(e) {
-        const url = e.target.value;
-
+    onChangeRecipeURL(url) {
         this.setState(prevState => ({
             currentRecipe: {
                 ...prevState.currentRecipe,
@@ -66,7 +60,6 @@ export default class Recipe extends Component {
                 this.setState({
                     currentRecipe: response.data
                 });
-                console.log(response.data);
             })
             .catch(e => {
                 console.log(e);
@@ -101,45 +94,20 @@ export default class Recipe extends Component {
     }
 
     render() {
-        const { currentRecipe } = this.state;
-
+        const currentRecipe = this.state.currentRecipe;
         return (
             <div>
                 {currentRecipe ? (
                     <div className="edit-form">
                         <h4>Recipe</h4>
-                        <form>
-                            <div className="form-group">
-                                <label htmlFor="title">Name</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    id="title"
-                                    value={currentRecipe.name || ''}
-                                    onChange={this.onChangeName}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="description">Description</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    id="description"
-                                    value={currentRecipe.description || ''}
-                                    onChange={this.onChangeDescription}
-                                />
-                            </div>
-                            <div className={"form-group"}>
-                                <label htmlFor="recipeURL">Recipe URL</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    id="recipeURL"
-                                    value={currentRecipe.recipeURL || ''}
-                                    onChange={this.onChangeRecipeURL}
-                                />
-                            </div>
-                        </form>
+                        <RecipeForm
+                            name={currentRecipe.name}
+                            description={currentRecipe.description}
+                            recipeURL={currentRecipe.recipeURL}
+                            onChangeName={this.onChangeName}
+                            onChangeDescription={this.onChangeDescription}
+                            onChangeRecipeURL={this.onChangeRecipeURL}
+                        />
 
                         <button
                             className="badge bg-danger mr-2"
@@ -159,7 +127,7 @@ export default class Recipe extends Component {
                     </div>
                 ) : (
                     <div>
-                        <br />
+                        <br/>
                         <p>Select a Recipe...</p>
                     </div>
                 )}

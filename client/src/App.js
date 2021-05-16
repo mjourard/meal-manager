@@ -1,7 +1,7 @@
 import './App.css';
 import {Link,Switch,Route} from "react-router-dom";
 import AddRecipe from "./components/pages/add-recipe.component";
-import Recipe from "./components/recipe.component";
+import EditRecipe from "./components/pages/edit-recipe.component";
 import DisplayRecipes from "./components/pages/display-recipes.component";
 import RecipeSelector from "./components/pages/recipe-selector.component";
 import DisplayOrders from "./components/pages/display-orders.components";
@@ -41,7 +41,7 @@ function App() {
           <Switch>
             <Route exact path={["/", "/recipes"]} component={DisplayRecipes} />
             <Route exact path="/add" component={AddRecipe} />
-            <Route path="/recipes/:id" component={Recipe} />
+            <Route path="/recipes/:id" component={EditRecipe} />
             <Route path="/choose-recipes" component={RecipeSelector} />
             <Route path="/orders" component={DisplayOrders} />
           </Switch>
