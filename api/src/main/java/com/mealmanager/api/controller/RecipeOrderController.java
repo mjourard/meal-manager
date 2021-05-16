@@ -67,4 +67,18 @@ public class RecipeOrderController {
         }
     }
 
+    @GetMapping("/orders")
+    public ResponseEntity<List<RecipeOrder>> getOrders() {
+        try {
+            List<RecipeOrder> orders = recipeOrderRepository.findAll();
+            if (orders.isEmpty()) {
+                return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(orders, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Error while retrieving orders", e);
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

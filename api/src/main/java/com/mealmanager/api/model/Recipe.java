@@ -16,11 +16,15 @@ public class Recipe {
     @Column(name = "description", nullable = true)
     private String description;
 
+    @Column(name = "recipeurl", nullable = true)
+    private String recipeURL;
+
     public Recipe() {}
 
-    public Recipe(String name, String description) {
+    public Recipe(String name, String description, String recipeURL) {
         this.name = name;
         this.description = description;
+        this.recipeURL = recipeURL;
     }
 
     public long getId() {
@@ -43,5 +47,9 @@ public class Recipe {
         return this.description;
     }
 
+    public void setRecipeURL(String url) { this.recipeURL = url; }
 
+    public String getRecipeURL() {
+        return this.recipeURL;
+    }
 }

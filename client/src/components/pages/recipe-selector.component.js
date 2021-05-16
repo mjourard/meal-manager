@@ -1,6 +1,7 @@
 import {Component} from "react";
 import RecipesDataService from "../../services/recipes.service";
 import OrdersDataService from "../../services/orders.service";
+import UsersDataService from "../../services/users.service";
 import RecipesList from "../recipes-list.component";
 
 export default class RecipeSelector extends Component {
@@ -74,10 +75,20 @@ export default class RecipeSelector extends Component {
     }
 
     retrieveUsers() {
+        UsersDataService.getAll()
+            .then(response => {
+                this.setState({
+                    users: response.data
+                });
+                console.log(this.state);
+            })
+            .catch(e => {
+                console.log(e);
+            });
         this.setState({
             users: [
-                {id: 1, name: "Matt Dijon", email: "mdijon@gmail.com", defaultChecked: false},
-                {id: 2, name: "Nicole Brown", email: "nbrown@gmail.com", defaultChecked: true},
+                {id: 1, firstName: "Matt", lastName: "Dijon", email: "mdijon@gmail.com", defaultChecked: false},
+                {id: 2, firstName: "Nicole", lastName: "Brown", email: "nbrown@gmail.com", defaultChecked: true},
             ]
         })
     }
@@ -91,7 +102,11 @@ export default class RecipeSelector extends Component {
     }
 
     addRecipeSelection(recipe) {
-        this.state.selectedRecipes.push(recipe);
+        let newRecipes = this.state.selectedRecipes;
+        newRecipes.push(recipe);
+        this.setState({
+            selectedRecipes: newRecipes
+        });
     }
 
     removeRecipeSelection() {
@@ -142,16 +157,16 @@ export default class RecipeSelector extends Component {
                             {recipes &&
                             recipes.map((recipe, index) => (
                                 <li key={index}>
-                                    <a
+                                    <button
+                                        type={"button"}
                                         className={"dropdown-item"}
-                                        href={"#"}
                                         onClick={() => {
                                             this.addRecipeSelection(recipe);
                                         }
                                         }
                                     >
                                         {recipe.name}
-                                    </a>
+                                    </button>
                                 </li>
                             ))}
                         </ul>

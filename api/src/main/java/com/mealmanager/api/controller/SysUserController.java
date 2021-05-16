@@ -52,7 +52,7 @@ public class SysUserController {
     public ResponseEntity<SysUser> createSysUser(@RequestBody SysUser sysUser) {
         try {
             SysUser _sysUser = sysUserRepository
-                    .save(new SysUser(sysUser.getFirstName(), sysUser.getLastName(), sysUser.getEmail()));
+                    .save(new SysUser(sysUser.getFirstName(), sysUser.getLastName(), sysUser.getEmail(), sysUser.getDefaultChecked()));
             return new ResponseEntity<>(_sysUser, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

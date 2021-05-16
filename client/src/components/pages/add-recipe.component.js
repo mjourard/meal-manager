@@ -1,11 +1,13 @@
 import { Component } from "react";
 import RecipesDataService from "../../services/recipes.service";
+import RecipeForm from "../recipe-form.component";
 
 export default class AddRecipe extends Component {
     constructor(props) {
         super(props);
         this.onChangeName = this.onChangeName.bind(this);
         this.onChangeDescription = this.onChangeDescription.bind(this);
+        this.onChangeRecipeURL = this.onChangeRecipeURL.bind(this);
         this.saveRecipe = this.saveRecipe.bind(this);
         this.newRecipe = this.newRecipe.bind(this);
 
@@ -13,21 +15,26 @@ export default class AddRecipe extends Component {
             id: null,
             name: "",
             description: "",
-
+            recipeURL: "",
             submitted: false
         };
     }
 
-    onChangeName(e) {
+    onChangeName(name) {
         this.setState({
-            name: e.target.value
+            name: name
         });
     }
 
-    onChangeDescription(e) {
+    onChangeDescription(desc) {
         this.setState({
-            description: e.target.value
+            description: desc
         });
+    }
+    onChangeRecipeURL(url) {
+        this.setState({
+            recipeURL: url
+        })
     }
 
     saveRecipe() {
@@ -65,6 +72,7 @@ export default class AddRecipe extends Component {
     render() {
         return (
             <div className="submit-form">
+                <h4>Add New Recipe</h4>
                 {this.state.submitted ? (
                     <div>
                         <h4>You submitted successfully!</h4>
@@ -74,31 +82,14 @@ export default class AddRecipe extends Component {
                     </div>
                 ) : (
                     <div>
-                        <div className="form-group">
-                            <label htmlFor="title">Title</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="title"
-                                required
-                                value={this.state.title}
-                                onChange={this.onChangeName}
-                                name="title"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="description">Description</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="description"
-                                required
-                                value={this.state.description}
-                                onChange={this.onChangeDescription}
-                                name="description"
-                            />
-                        </div>
+                        <RecipeForm
+                            name={this.state.name}
+                            description={this.state.description}
+                            recipeURL={this.state.recipeURL}
+                            onChangeName={this.onChangeName}
+                            onChangeDescription={this.onChangeDescription}
+                            onChangeRecipeURL={this.onChangeRecipeURL}
+                        />
 
                         <button onClick={this.saveRecipe} className="btn btn-success">
                             Submit

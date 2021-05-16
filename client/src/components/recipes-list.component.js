@@ -46,6 +46,7 @@ export default class RecipesList extends Component {
                             name={currentRecipe.name}
                             description={currentRecipe.description}
                             id={currentRecipe.id}
+                            recipeURL={currentRecipe.recipeURL}
                         />
                     ) : (
                         <div>

@@ -19,12 +19,16 @@ public class SysUser {
     @Column(name = "email", nullable = false)
     private String email;
 
+    @Column(name = "defaultchecked", nullable = false, columnDefinition = "boolean default true")
+    private Boolean defaultChecked;
+
     public SysUser() {}
 
-    public SysUser(String firstname, String lastname, String email) {
+    public SysUser(String firstname, String lastname, String email, Boolean defaultChecked) {
         this.firstName = firstname;
         this.lastName = lastname;
         this.email = email;
+        this.defaultChecked = defaultChecked;
     }
 
     public long getId() {
@@ -53,5 +57,13 @@ public class SysUser {
 
     public String getEmail() {
         return this.email;
+    }
+
+    public void setDefaultChecked(Boolean defaultChecked) {
+        this.defaultChecked = defaultChecked;
+    }
+
+    public Boolean getDefaultChecked() {
+        return this.defaultChecked;
     }
 }

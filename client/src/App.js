@@ -4,6 +4,7 @@ import AddRecipe from "./components/pages/add-recipe.component";
 import Recipe from "./components/recipe.component";
 import DisplayRecipes from "./components/pages/display-recipes.component";
 import RecipeSelector from "./components/pages/recipe-selector.component";
+import DisplayOrders from "./components/pages/display-orders.components";
 
 function App() {
   return (
@@ -28,6 +29,11 @@ function App() {
                 Choose Recipes
               </Link>
             </li>
+            <li className={"nav-item"}>
+              <Link to={"/orders"} className={"nav-link"}>
+                Orders
+              </Link>
+            </li>
           </div>
         </nav>
 
@@ -37,6 +43,7 @@ function App() {
             <Route exact path="/add" component={AddRecipe} />
             <Route path="/recipes/:id" component={Recipe} />
             <Route path="/choose-recipes" component={RecipeSelector} />
+            <Route path="/orders" component={DisplayOrders} />
           </Switch>
         </div>
       </div>

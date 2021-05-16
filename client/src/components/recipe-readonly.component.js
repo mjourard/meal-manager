@@ -16,10 +16,16 @@ const RecipeReadonly = (props) => {
                 </label>{" "}
                 {props.description}
             </div>
+            <div>
+                <label>
+                    <strong>Recipe URL:</strong>
+                </label>{" "}
+                <a href={props.recipeURL} target={"_blank"} rel="noreferrer">{props.recipeURL}</a>
+            </div>
 
             <Link
                 to={"/recipes/" + props.id}
-                className="badge badge-warning"
+                className="badge bg-warning"
             >
                 Edit
             </Link>

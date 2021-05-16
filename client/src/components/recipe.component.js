@@ -6,6 +6,7 @@ export default class Recipe extends Component {
         super(props);
         this.onChangeName = this.onChangeName.bind(this);
         this.onChangeDescription = this.onChangeDescription.bind(this);
+        this.onChangeRecipeURL = this.onChangeRecipeURL.bind(this);
         this.getRecipe = this.getRecipe.bind(this);
         this.updateRecipe = this.updateRecipe.bind(this);
         this.deleteRecipe = this.deleteRecipe.bind(this);
@@ -14,7 +15,8 @@ export default class Recipe extends Component {
             currentRecipe: {
                 id: null,
                 name: "",
-                description: ""
+                description: "",
+                recipeURL: ""
             },
             message: ""
         };
@@ -26,7 +28,6 @@ export default class Recipe extends Component {
 
     onChangeName(e) {
         const name = e.target.value;
-
         this.setState(function(prevState) {
             return {
                 currentRecipe: {
@@ -44,6 +45,17 @@ export default class Recipe extends Component {
             currentRecipe: {
                 ...prevState.currentRecipe,
                 description: description
+            }
+        }));
+    }
+
+    onChangeRecipeURL(e) {
+        const url = e.target.value;
+
+        this.setState(prevState => ({
+            currentRecipe: {
+                ...prevState.currentRecipe,
+                recipeURL: url
             }
         }));
     }
@@ -103,7 +115,7 @@ export default class Recipe extends Component {
                                     type="text"
                                     className="form-control"
                                     id="title"
-                                    value={currentRecipe.name}
+                                    value={currentRecipe.name || ''}
                                     onChange={this.onChangeName}
                                 />
                             </div>
@@ -113,14 +125,24 @@ export default class Recipe extends Component {
                                     type="text"
                                     className="form-control"
                                     id="description"
-                                    value={currentRecipe.description}
+                                    value={currentRecipe.description || ''}
                                     onChange={this.onChangeDescription}
+                                />
+                            </div>
+                            <div className={"form-group"}>
+                                <label htmlFor="recipeURL">Recipe URL</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="recipeURL"
+                                    value={currentRecipe.recipeURL || ''}
+                                    onChange={this.onChangeRecipeURL}
                                 />
                             </div>
                         </form>
 
                         <button
-                            className="badge badge-danger mr-2"
+                            className="badge bg-danger mr-2"
                             onClick={this.deleteRecipe}
                         >
                             Delete
@@ -128,7 +150,7 @@ export default class Recipe extends Component {
 
                         <button
                             type="submit"
-                            className="badge badge-success"
+                            className="badge bg-success"
                             onClick={this.updateRecipe}
                         >
                             Update
