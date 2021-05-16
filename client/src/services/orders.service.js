@@ -8,6 +8,10 @@ class OrdersDataService {
     getAll() {
         return http.get("/orders");
     }
+
+    get(id) {
+        return http.get(`/orders/${id}`);
+    }
 }
 
 export default new OrdersDataService();

@@ -1,6 +1,7 @@
 package com.mealmanager.api.controller;
 
 import com.mealmanager.api.dto.RecipeOrderDTO;
+import com.mealmanager.api.dto.RecipeOrderDetailsDTO;
 import com.mealmanager.api.model.*;
 import com.mealmanager.api.repository.*;
 import org.slf4j.Logger;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -81,4 +83,30 @@ public class RecipeOrderController {
         }
     }
 
+    @GetMapping("/orders/{id}")
+    public ResponseEntity<RecipeOrderDetailsDTO> getOrderDetails(@PathVariable("id") long id) {
+        try {
+            Optional<RecipeOrder> orderData = recipeOrderRepository.findById(id);
+            if (orderData.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            RecipeOrder order = orderData.get();
+            RecipeOrderDetailsDTO dto = new RecipeOrderDetailsDTO(order.getId());
+            List<RecipeOrderItem> orderItems = recipeOrderItemRepository.findByOrderId(order.getId());
+            for(RecipeOrderItem item : orderItems) {
+                dto.addSelectedRecipe(item.getRecipe());
+            }
+            List<RecipeOrderRecipient> orderRecipients = recipeOrderRecipientRepository.findByOrderId(order.getId());
+            for(RecipeOrderRecipient user : orderRecipients) {
+                dto.addSelecteduser(user.getSysUser());
+            }
+            if (order.getMessage() != null) {
+                dto.setMessage(order.getMessage());
+            }
+            return new ResponseEntity<>(dto, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Error while retrieving orders", e);
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

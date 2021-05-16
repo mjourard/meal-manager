@@ -29,4 +29,8 @@ public class RecipeOrderRecipient {
         this.orderId = orderId;
         this.sysUserId = sysUserId;
     }
+
+    public SysUser getSysUser() {
+        return this.sysUser;
+    }
 }

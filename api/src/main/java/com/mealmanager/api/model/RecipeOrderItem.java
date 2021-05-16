@@ -30,4 +30,8 @@ public class RecipeOrderItem {
         this.orderId = orderId;
         this.recipeId = recipeId;
     }
+
+    public Recipe getRecipe() {
+        return this.recipe;
+    }
 }

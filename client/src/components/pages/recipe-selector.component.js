@@ -15,6 +15,7 @@ export default class RecipeSelector extends Component {
         this.addRandomRecipe = this.addRandomRecipe.bind(this);
         this.handleMessageChange = this.handleMessageChange.bind(this);
         this.handleUserChange = this.handleUserChange.bind(this);
+        this.onChangeAddAdditionalMessage = this.onChangeAddAdditionalMessage.bind(this);
         this.submit = this.submit.bind(this);
 
         this.state = {
@@ -22,7 +23,8 @@ export default class RecipeSelector extends Component {
             selectedRecipes: [],
             users: [],
             selectedUserIds: new Set(),
-            message: ""
+            message: "",
+            showMessageBox: false
         };
     }
 
@@ -38,18 +40,24 @@ export default class RecipeSelector extends Component {
         }
     }
 
+    onChangeAddAdditionalMessage(e) {
+        this.setState({
+            showMessageBox: !!(e.target.checked)
+        })
+    }
+
     submit() {
         let data = {
-            selectedRecipes: this.state.selectedRecipes,
+            selectedRecipes: this.state.selectedRecipes.map(recipe => recipe.id),
             selectedUserIds: Array.from(this.state.selectedUserIds)
         };
-        if (this.state.message !== "") {
+        if (this.state.showMessageBox && this.state.message !== "") {
             data['message'] = this.state.message;
         }
         OrdersDataService.create(data)
             .then(response => {
-                console.log("Successfully submitted order");
-                console.log(response);
+                console.log("Successfully submitted order! Order id = " + response.data.id)
+                //TODO: make UI message as well
             })
             .catch(e => {
                 console.log(e);
@@ -194,13 +202,18 @@ export default class RecipeSelector extends Component {
                             ))}
                         </div>
                         <div className={"mb-3 form-check"}>
-                            <input type={"checkbox"} className={"form-check-input"} id={"add-additional-message-checkbox"} />
+                            <input type={"checkbox"} className={"form-check-input"} id={"add-additional-message-checkbox"}
+                                   onChange={this.onChangeAddAdditionalMessage}
+                            />
                             <label className={"form-check-label"} htmlFor={"add-additional-message-checkbox"}>I'd like to include a message</label>
                         </div>
-                        <div className="mb-3" id={"hidden-additional-message"}>
-                            <label htmlFor="additional-message" className="form-label">Say something nice...</label>
-                            <textarea className="form-control" id="additional-message" rows="4" value={this.state.message} onChange={this.handleMessageChange}/>
-                        </div>
+                        {this.state.showMessageBox ?
+                            <div className="mb-3" id={"hidden-additional-message"}>
+                                <label htmlFor="additional-message" className="form-label">Say something nice...</label>
+                                <textarea className="form-control" id="additional-message" rows="4"
+                                          value={this.state.message} onChange={this.handleMessageChange}/>
+                            </div>
+                        : ""}
                         <button type={"button"} className={"btn btn-primary"} onClick={this.submit}>
                             Submit
                         </button>

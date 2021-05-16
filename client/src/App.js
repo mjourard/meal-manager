@@ -5,6 +5,7 @@ import EditRecipe from "./components/pages/edit-recipe.component";
 import DisplayRecipes from "./components/pages/display-recipes.component";
 import RecipeSelector from "./components/pages/recipe-selector.component";
 import DisplayOrders from "./components/pages/display-orders.components";
+import EditOrder from "./components/pages/edit-order.components";
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
             <Route path="/recipes/:id" component={EditRecipe} />
             <Route path="/choose-recipes" component={RecipeSelector} />
             <Route path="/orders" component={DisplayOrders} />
+            <Route path="/myorders/:id" component={EditOrder} />
           </Switch>
         </div>
       </div>

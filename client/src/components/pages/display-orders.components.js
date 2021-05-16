@@ -1,6 +1,7 @@
 import { Component } from "react";
 import OrdersDataService from "../../services/orders.service";
 import Table from "../table.component";
+import {Link} from "react-router-dom";
 //import OrdersList from "../orders-list.component";
 
 export default class DisplayOrders extends Component {
@@ -21,8 +22,13 @@ export default class DisplayOrders extends Component {
     retrieveOrders() {
         OrdersDataService.getAll()
             .then(response => {
+                let orders = [];
+                response.data.forEach(order => {
+                    order["Edit Link"] = <Link to={"/myorders/" + order.id}>Edit</Link>;
+                    orders.push(order);
+                })
                 this.setState({
-                    orders: response.data
+                    orders: orders
                 });
                 console.log(response.data);
             })
