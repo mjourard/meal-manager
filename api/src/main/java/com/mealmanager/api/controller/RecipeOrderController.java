@@ -98,7 +98,7 @@ public class RecipeOrderController {
             }
             List<RecipeOrderRecipient> orderRecipients = recipeOrderRecipientRepository.findByOrderId(order.getId());
             for(RecipeOrderRecipient user : orderRecipients) {
-                dto.addSelecteduser(user.getSysUser());
+                dto.addSelectedUser(user.getSysUser());
             }
             if (order.getMessage() != null) {
                 dto.setMessage(order.getMessage());

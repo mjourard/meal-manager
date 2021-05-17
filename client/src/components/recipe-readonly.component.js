@@ -3,7 +3,6 @@ import {Link} from "react-router-dom";
 const RecipeReadonly = (props) => {
     return (
         <div>
-            <h4>Recipe</h4>
             <div>
                 <label>
                     <strong>Name:</strong>

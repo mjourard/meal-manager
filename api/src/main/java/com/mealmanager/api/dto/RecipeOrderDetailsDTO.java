@@ -10,8 +10,8 @@ import java.util.List;
 
 public class RecipeOrderDetailsDTO {
     private Long orderId;
-    private List<Recipe> selectedRecipes;
-    private List<SysUser> selectedUsers;
+    private final List<Recipe> selectedRecipes;
+    private final List<SysUser> selectedUsers;
     private String message;
 
     public RecipeOrderDetailsDTO() {
@@ -32,11 +32,11 @@ public class RecipeOrderDetailsDTO {
         this.selectedRecipes.add(recipe);
     }
 
-    public void addSelecteduser(SysUser user) {
+    public void addSelectedUser(SysUser user) {
         this.selectedUsers.add(user);
     }
 
-    public List<SysUser> getSelectedUser() {
+    public List<SysUser> getSelectedUsers() {
         return this.selectedUsers;
     }
 

@@ -1,5 +1,6 @@
 import { Component } from "react";
 import OrdersDataService from "../../services/orders.service";
+import OrderDetails from "../order-details.component";
 
 export default class EditOrder extends Component {
     constructor(props) {
@@ -21,7 +22,10 @@ export default class EditOrder extends Component {
             .then(response => {
                 console.log(response.data);
                 this.setState({
-                    currentOrder: response.data
+                    currentOrder: {
+                        ...response.data,
+                        id: id
+                    }
                 });
             })
             .catch(e => {
@@ -30,12 +34,18 @@ export default class EditOrder extends Component {
     }
 
     render() {
+        const currentOrder = this.state.currentOrder;
         return (
             <div className="list row">
                 <div className="col-md-12">
-                    <h4>Order Details</h4>
+                    <h2>Order Details</h2>
                     {this.state.currentOrder.id ?
-                        <p>loaded!</p>
+                        <OrderDetails
+                            id={currentOrder.id}
+                            message={currentOrder.message}
+                            selectedRecipes={currentOrder.selectedRecipes}
+                            selectedUsers={currentOrder.selectedUsers}
+                        />
                     : <p>Loading</p>}
                 </div>
             </div>
