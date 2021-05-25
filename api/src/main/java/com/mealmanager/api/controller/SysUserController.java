@@ -2,17 +2,22 @@ package com.mealmanager.api.controller;
 
 import com.mealmanager.api.model.SysUser;
 import com.mealmanager.api.repository.SysUserRepository;
+import com.mealmanager.api.services.EmailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Profile("api")
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api")
@@ -22,6 +27,9 @@ public class SysUserController {
 
     @Autowired
     SysUserRepository sysUserRepository;
+
+    @Autowired
+    EmailService emailService;
 
     @GetMapping("/users")
     public ResponseEntity<List<SysUser>> getAllSysUsers(@RequestParam(required = false) String name) {
@@ -102,6 +110,21 @@ public class SysUserController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/emailuser")
+    public ResponseEntity<HttpStatus> testSendEmail() {
+        String recipient = "mjourard@gmail.com";
+        String subject = "Amazon SES SMTP Interface Test";
+        String content = "<p>Hi there, this is a test email.</p>";
+
+        try {
+            emailService.sendEmail(recipient, subject, content);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (UnsupportedEncodingException | MessagingException e) {
+            logger.error("Exception thrown sending email", e);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 }

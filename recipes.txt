@@ -13,7 +13,7 @@ Oven Baked Philly Cheesesteak sandwiches
 Spinach Artichoke Dip Cheesy Bread
 Easy Grilled Jerk Chicken
 ASian Sweet Chili Chicken
-Panda Express Beijin Beef
+* Panda Express Beijin Beef
 One Pot Basil Chicken Coconut Chicken Curry
 sliced Garlic Bread Loaf
 Turkey Moist Maker Sandiwich
@@ -87,7 +87,7 @@ Easy Curry Chicken
 Cheesecake Factory Chicken Bellagio
 Philly Cheesesteak Stuffed Shells
 Creamy chicken Marsala
-Beef Quesadillas
+* Beef Quesadillas
 Meatball Subs
 Crunchwrap Supreme
 Roast w/ potatoes & Carrots

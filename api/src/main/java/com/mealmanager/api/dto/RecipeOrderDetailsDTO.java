@@ -1,8 +1,6 @@
 package com.mealmanager.api.dto;
 
 import com.mealmanager.api.model.Recipe;
-import com.mealmanager.api.model.RecipeOrder;
-import com.mealmanager.api.model.RecipeOrderRecipient;
 import com.mealmanager.api.model.SysUser;
 
 import java.util.ArrayList;
