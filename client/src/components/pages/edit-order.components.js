@@ -4,7 +4,6 @@ import OrderDetails from "../order-details.component";
 
 export default class EditOrder extends Component {
     constructor(props) {
-        console.log("in editOrder");
         super(props);
         this.getOrder = this.getOrder.bind(this);
 
@@ -20,7 +19,6 @@ export default class EditOrder extends Component {
     getOrder(id) {
         OrdersDataService.get(id)
             .then(response => {
-                console.log(response.data);
                 this.setState({
                     currentOrder: {
                         ...response.data,

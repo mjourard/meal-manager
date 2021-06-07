@@ -24,15 +24,20 @@ public class EmailService {
 
     private final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
-    @Async
+
     public void sendEmail(String recipient, String subject, String content) throws UnsupportedEncodingException, MessagingException {
+        String[] arr = new String[]{recipient};
+        sendEmail(arr, subject, content);
+    }
+
+    @Async
+    public void sendEmail(String[] recipient, String subject, String content) throws UnsupportedEncodingException, MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message);
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
         helper.setFrom(fromEmailAddress, "No Reply (Meal Manager)");
         helper.setTo(recipient);
         helper.setSubject(subject);
         helper.setText(content, true);
         mailSender.send(message);
     }
-
 }

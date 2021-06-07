@@ -30,7 +30,6 @@ export default class DisplayOrders extends Component {
                 this.setState({
                     orders: orders
                 });
-                console.log(response.data);
             })
             .catch(e => {
                 console.log(e);

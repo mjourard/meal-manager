@@ -34,8 +34,10 @@ export default class RecipeSelector extends Component {
 
     handleUserChange(user, event) {
         if (event.target.checked === true) {
+            console.log('adding user: ' + user.id);
             this.state.selectedUserIds.add(user.id)
         } else if (this.state.selectedUserIds.has(user.id)) {
+            console.log('deleting user: ' + user.id);
             this.state.selectedUserIds.delete(user.id)
         }
     }
@@ -56,8 +58,6 @@ export default class RecipeSelector extends Component {
         }
         OrdersDataService.create(data)
             .then(response => {
-                console.log("Successfully submitted order! Order id = " + response.data.id)
-                //TODO: make UI message as well
             })
             .catch(e => {
                 console.log(e);
@@ -75,7 +75,6 @@ export default class RecipeSelector extends Component {
                 this.setState({
                     recipes: response.data
                 });
-                console.log(this.state);
             })
             .catch(e => {
                 console.log(e);
@@ -88,17 +87,15 @@ export default class RecipeSelector extends Component {
                 this.setState({
                     users: response.data
                 });
-                console.log(this.state);
+                response.data.forEach(user => {
+                    if (user.defaultChecked) {
+                        this.state.selectedUserIds.add(user.id);
+                    }
+                })
             })
             .catch(e => {
                 console.log(e);
             });
-        this.setState({
-            users: [
-                {id: 1, firstName: "Matt", lastName: "Dijon", email: "mdijon@gmail.com", defaultChecked: false},
-                {id: 2, firstName: "Nicole", lastName: "Brown", email: "nbrown@gmail.com", defaultChecked: true},
-            ]
-        })
     }
 
     refreshList() {
@@ -120,7 +117,6 @@ export default class RecipeSelector extends Component {
     removeRecipeSelection() {
         RecipesDataService.deleteAll()
             .then(response => {
-                console.log(response.data);
                 this.refreshList();
             })
             .catch(e => {

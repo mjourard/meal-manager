@@ -72,7 +72,6 @@ export default class EditRecipe extends Component {
             this.state.currentRecipe
         )
             .then(response => {
-                console.log(response.data);
                 this.setState({
                     message: "The recipe was updated successfully!"
                 });
@@ -85,7 +84,6 @@ export default class EditRecipe extends Component {
     deleteRecipe() {
         RecipesDataService.delete(this.state.currentRecipe.id)
             .then(response => {
-                console.log(response.data);
                 this.props.history.push('/recipes')
             })
             .catch(e => {

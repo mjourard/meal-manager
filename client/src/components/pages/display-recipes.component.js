@@ -37,7 +37,6 @@ export default class DisplayRecipes extends Component {
     removeAllRecipes() {
         RecipesDataService.deleteAll()
             .then(response => {
-                console.log(response.data);
                 this.refreshList();
             })
             .catch(e => {

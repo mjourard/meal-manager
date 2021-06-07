@@ -1,7 +1,10 @@
 package com.mealmanager.api.controller;
 
+import com.mealmanager.api.dto.EmailTemplateData;
 import com.mealmanager.api.dto.RecipeOrderDTO;
 import com.mealmanager.api.dto.RecipeOrderDetailsDTO;
+import com.mealmanager.api.dto.templatedata.GroceryMealOrderData;
+import com.mealmanager.api.messagequeue.Sender;
 import com.mealmanager.api.model.*;
 import com.mealmanager.api.repository.*;
 import org.slf4j.Logger;
@@ -15,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@Profile("api")
+
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api")
@@ -38,6 +41,9 @@ public class RecipeOrderController {
     @Autowired
     RecipeOrderRecipientRepository recipeOrderRecipientRepository;
 
+    @Autowired
+    Sender sender;
+
     @PostMapping("/orders")
     public ResponseEntity<RecipeOrder> placeOrder(@RequestBody RecipeOrderDTO recipeOrder) {
         try {
@@ -55,14 +61,25 @@ public class RecipeOrderController {
                 return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
-            //save the order
+            //save the order and create the data DTO
+            GroceryMealOrderData templateData = new GroceryMealOrderData();
             RecipeOrder newOrder = recipeOrderRepository.save(new RecipeOrder(recipeOrder.getMessage()));
             for(Recipe recipe : recipes) {
                 recipeOrderItemRepository.save(new RecipeOrderItem(newOrder.getId(), recipe.getId()));
+                templateData.addMeal(recipe.getName());
             }
+            templateData.setMessage(recipeOrder.getMessage());
+
+            EmailTemplateData emailData = new EmailTemplateData();
             for(SysUser user : users) {
                 recipeOrderRecipientRepository.save(new RecipeOrderRecipient(newOrder.getId(), user.getId()));
+                emailData.addTo(List.of(user.getEmail()));
             }
+
+            emailData.setSubject(templateData.getStandardSubject())
+                    .setTemplateName(templateData.getTemplateName())
+                    .setTemplateData(templateData);
+            sender.send(emailData);
 
             return new ResponseEntity<>(newOrder, HttpStatus.CREATED);
         } catch (Exception e) {

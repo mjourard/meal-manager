@@ -6,6 +6,9 @@ import DisplayRecipes from "./components/pages/display-recipes.component";
 import RecipeSelector from "./components/pages/recipe-selector.component";
 import DisplayOrders from "./components/pages/display-orders.components";
 import EditOrder from "./components/pages/edit-order.components";
+import DisplayUsers from "./components/pages/display-users.component";
+import EditUser from "./components/pages/edit-user.component";
+import AddUser from "./components/pages/add-user.component";
 
 function App() {
   return (
@@ -35,6 +38,11 @@ function App() {
                 Orders
               </Link>
             </li>
+            <li className={"nav-item"}>
+              <Link to={"/users"} className={"nav-link"}>
+                Users
+              </Link>
+            </li>
           </div>
         </nav>
 
@@ -46,6 +54,9 @@ function App() {
             <Route path="/choose-recipes" component={RecipeSelector} />
             <Route path="/orders" component={DisplayOrders} />
             <Route path="/myorders/:id" component={EditOrder} />
+            <Route path="/users" component={DisplayUsers} />
+            <Route path="/myusers/:id" component={EditUser} />
+            <Route path="/adduser" component={AddUser} />
           </Switch>
         </div>
       </div>

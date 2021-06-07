@@ -1,23 +1,24 @@
 package com.mealmanager.api.controller;
 
+import com.mealmanager.api.dto.EmailTemplateData;
+import com.mealmanager.api.dto.templatedata.GroceryMealOrderData;
+import com.mealmanager.api.messagequeue.Receiver;
+import com.mealmanager.api.messagequeue.Sender;
 import com.mealmanager.api.model.SysUser;
 import com.mealmanager.api.repository.SysUserRepository;
 import com.mealmanager.api.services.EmailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
-@Profile("api")
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api")
@@ -30,6 +31,12 @@ public class SysUserController {
 
     @Autowired
     EmailService emailService;
+
+    @Autowired
+    Receiver receiver;
+
+    @Autowired
+    Sender sender;
 
     @GetMapping("/users")
     public ResponseEntity<List<SysUser>> getAllSysUsers(@RequestParam(required = false) String name) {
@@ -63,6 +70,7 @@ public class SysUserController {
                     .save(new SysUser(sysUser.getFirstName(), sysUser.getLastName(), sysUser.getEmail(), sysUser.getDefaultChecked()));
             return new ResponseEntity<>(_sysUser, HttpStatus.CREATED);
         } catch (Exception e) {
+            logger.error("Error while trying to add a single user", e);
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -126,5 +134,20 @@ public class SysUserController {
             logger.error("Exception thrown sending email", e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/sendmq")
+    public ResponseEntity<String> testSendRabbitMQ() {
+        GroceryMealOrderData templateData = new GroceryMealOrderData();
+        templateData.addMeal("Slow Cooker Balsamic Pot Roast");
+        templateData.addMeal("Bacon Brown Sugar Garlic Chicken");
+        templateData.addMeal("Slow Cooker Brown Sugar Garlic Chicken");
+        EmailTemplateData data = new EmailTemplateData()
+                .addTo(List.of("mjourard@gmail.com"))
+                .setSubject("Test Emailllllll")
+                .setTemplateName("grocery-meal-order")
+                .setTemplateData(templateData);
+        sender.send(data);
+        return new ResponseEntity<>("Message sent", HttpStatus.OK);
     }
 }
