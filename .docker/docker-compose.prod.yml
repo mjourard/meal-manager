@@ -1,0 +1,47 @@
+version: '3.5'
+
+services:
+  db.mealmanager:
+    image: 'postgres:13.1-alpine'
+    container_name: mm-db
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=compose-postgres
+      - POSTGRES_PASSWORD=compose-postgres
+  rabbitmq.mealmanager:
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+  api.mealmanager:
+    image: 'mealmanager/mm-api:latest'
+    container_name: mm-api
+    ports:
+      - 8080:8080
+    environment:
+      - AWS_SES_REGION=${AWS_SES_REGION}
+      - AWS_SMTP_USERNAME=${AWS_SMTP_USERNAME}
+      - AWS_SMTP_PASSWORD=${AWS_SMTP_PASSWORD}
+      - MEALMANAGER_EMAIL_FROM=${MEALMANAGER_EMAIL_FROM}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - CORS_ALLOWED_ORIGIN=http://client.mealmanager
+    depends_on:
+      - rabbitmq.mealmanager
+      - db.mealmanager
+  client.mealmanager:
+    image: 'mealmanager/mm-client:latest'
+    container_name: mm-client
+    ports:
+      - 80:80
+    volumes:
+      - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./volumes/docker-entrypoint-initaws.d:/docker-entrypoint-initaws.d"
+  hoster:
+    container_name: hoster
+    image: dvdarias/docker-hoster
+    volumes:
+      - /etc/hosts:/tmp/hosts
+      - /run/docker.sock:/tmp/docker.sock
