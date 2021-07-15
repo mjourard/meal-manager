@@ -1,0 +1,5 @@
+./api/target
+./.idea/*
+./client/.idea
+./client/node_modules
+./client/build

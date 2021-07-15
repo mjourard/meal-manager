@@ -4,6 +4,8 @@ services:
   db.mealmanager:
     image: 'postgres:13.1-alpine'
     container_name: mm-db
+    ports:
+      - 5432:5432
     environment:
       - POSTGRES_USER=compose-postgres
       - POSTGRES_PASSWORD=compose-postgres

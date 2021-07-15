@@ -15,7 +15,7 @@ services:
       - "5672:5672"
       - "15672:15672"
   api.mealmanager:
-    image: 'mealmanager/mm-api:latest'
+    image: 'mjourard/mealmanager-api:latest'
     container_name: mm-api
     ports:
       - 8080:8080
@@ -31,7 +31,7 @@ services:
       - rabbitmq.mealmanager
       - db.mealmanager
   client.mealmanager:
-    image: 'mealmanager/mm-client:latest'
+    image: 'mjourard/mealmanager-client:latest'
     container_name: mm-client
     ports:
       - 80:80
