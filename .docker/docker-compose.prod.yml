@@ -9,11 +9,17 @@ services:
     environment:
       - POSTGRES_USER=compose-postgres
       - POSTGRES_PASSWORD=compose-postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - mealmanager
   rabbitmq.mealmanager:
     image: rabbitmq:management
     ports:
       - "5672:5672"
       - "15672:15672"
+    networks:
+      - mealmanager
   api.mealmanager:
     image: 'mjourard/mealmanager-api:latest'
     container_name: mm-api
@@ -32,18 +38,27 @@ services:
     depends_on:
       - rabbitmq.mealmanager
       - db.mealmanager
+    networks:
+      - mealmanager
   client.mealmanager:
     image: 'mjourard/mealmanager-client:latest'
     container_name: mm-client
     ports:
       - 80:80
-    volumes:
-      - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "./volumes/docker-entrypoint-initaws.d:/docker-entrypoint-initaws.d"
+    networks:
+      - mealmanager
   hoster:
     container_name: hoster
     image: dvdarias/docker-hoster
     volumes:
       - /etc/hosts:/tmp/hosts
       - /run/docker.sock:/tmp/docker.sock
+    networks:
+      - mealmanager
+
+volumes:
+  pgdata:
+
+networks:
+  mealmanager:
+    name: mealmanager

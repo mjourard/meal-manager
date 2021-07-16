@@ -2,6 +2,14 @@ import {Component} from "react";
 import RecipesDataService from "../../services/recipes.service";
 import RecipeForm from "../recipe-form.component";
 import RecipeReadonly from "../recipe-readonly.component";
+import CsvUpload from "../csv-upload.component";
+
+const exampleMultiRecipeFile = new Blob([[
+    ['Recipe', 'Description', 'URL'].join(','),
+    ['Chicken Parm Stuffed Shells', 'A description of the shells stuffed with chicken parmesan', 'https://www.delish.com/cooking/recipe-ideas/recipes/a58002/chicken-parm-stuffed-shells-recipe/'].join(','),
+    ['Chicken & Gravy', '', 'https://www.saltandlavender.com/chicken-and-gravy/'].join(','),
+    ['Pad Thai', '', ''].join(','),
+].join('\n')]);
 
 export default class AddRecipe extends Component {
     constructor(props) {
@@ -11,10 +19,13 @@ export default class AddRecipe extends Component {
         this.onChangeRecipeURL = this.onChangeRecipeURL.bind(this);
         this.saveRecipe = this.saveRecipe.bind(this);
         this.newRecipe = this.newRecipe.bind(this);
+        this.onUploadChange = this.onUploadChange.bind(this);
+        this.onSaveMultiple = this.onSaveMultiple.bind(this);
 
         let emptyRecipe = this.initEmptyRecipe();
         this.state = {
             ...emptyRecipe,
+            recipeFile: null,
             submitted: false,
             lastCreatedRecipe: this.initEmptyRecipe()
         };
@@ -74,6 +85,37 @@ export default class AddRecipe extends Component {
         });
     }
 
+    onUploadChange(file) {
+        this.setState({
+            recipeFile: file
+        });
+    }
+    onSaveMultiple(disableCallback) {
+        if (this.state.recipeFile === null ) {
+            //TODO: toast - no file selected
+            console.log('no file selected')
+            return;
+        }
+        //upload
+        RecipesDataService.multiCreate(this.state.recipeFile)
+            .then(response => {
+                this.setState({
+                    lastCreatedRecipe: response.data,
+                    submitted: true
+                });
+                this.newRecipe();
+            })
+            .catch(e => {
+                console.log(e);
+            });
+
+        //cleanup
+        this.setState({
+            recipeFile: null
+        });
+        disableCallback();
+    }
+
     render() {
         const newRecipe = this.state.lastCreatedRecipe;
 
@@ -105,6 +147,16 @@ export default class AddRecipe extends Component {
                         Submit
                     </button>
                 </div>
+                <h4 className="mt-5">Add Multiple Recipes</h4>
+                <CsvUpload
+                    exampleFile={exampleMultiRecipeFile}
+                    exampleFileName="recipes.csv"
+                    uploadLabel="Choose a csv file of recipes to upload..."
+                    uploadButtonText="Upload Recipes file"
+                    downloadExampleButtonText="Download an example recipes.csv file"
+                    onUploadChange={this.onUploadChange}
+                    onSaveMultiple={this.onSaveMultiple}
+                />
             </div>
         );
     }
