@@ -59,7 +59,7 @@ public class RecipeController {
     public ResponseEntity<Recipe> createRecipe(@RequestBody Recipe recipe) {
         try {
             Recipe _recipe = recipeRepository
-                    .save(new Recipe(recipe.getName(), recipe.getDescription(), recipe.getRecipeURL()));
+                    .save(new Recipe(recipe.getName(), recipe.getDescription(), recipe.getRecipeURL(), recipe.getDisabled()));
             return new ResponseEntity<>(_recipe, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -86,6 +86,20 @@ public class RecipeController {
             _recipe.setName(recipe.getName());
             _recipe.setDescription(recipe.getDescription());
             _recipe.setRecipeURL(recipe.getRecipeURL());
+            _recipe.setDisabled(recipe.getDisabled());
+            return new ResponseEntity<>(recipeRepository.save(_recipe), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/recipes/disable/{id}")
+    public ResponseEntity<Recipe> disableRecipe(@PathVariable("id") long id) {
+        Optional<Recipe> recipeData = recipeRepository.findById(id);
+
+        if (recipeData.isPresent()) {
+            Recipe _recipe = recipeData.get();
+            _recipe.setDisabled(true);
             return new ResponseEntity<>(recipeRepository.save(_recipe), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

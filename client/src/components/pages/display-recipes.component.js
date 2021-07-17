@@ -8,6 +8,7 @@ export default class DisplayRecipes extends Component {
         this.retrieveRecipes = this.retrieveRecipes.bind(this);
         this.refreshList = this.refreshList.bind(this);
         this.removeAllRecipes = this.removeAllRecipes.bind(this);
+        this.disableRecipe = this.disableRecipe.bind(this);
 
         this.state = {
             recipes: [],
@@ -33,6 +34,15 @@ export default class DisplayRecipes extends Component {
     refreshList() {
         this.retrieveRecipes();
     }
+    disableRecipe(recipe, index) {
+        RecipesDataService.disable(recipe.id)
+            .then(response => {
+                this.refreshList();
+            })
+            .catch(e => {
+                console.log(e);
+            })
+    }
 
     removeAllRecipes() {
         RecipesDataService.deleteAll()
@@ -52,6 +62,7 @@ export default class DisplayRecipes extends Component {
                     <h4>Recipes List</h4>
                     <RecipesList
                         recipes={this.state.recipes}
+                        removeRecipe={this.disableRecipe}
                     />
                     <button
                         className="m-3 btn btn-sm btn-danger"

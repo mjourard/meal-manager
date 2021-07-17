@@ -6,6 +6,7 @@ export default class RecipeForm extends Component {
         this.onChangeName = this.onChangeName.bind(this);
         this.onChangeDescription = this.onChangeDescription.bind(this);
         this.onChangeRecipeURL = this.onChangeRecipeURL.bind(this);
+        this.onChangeDisabled = this.onChangeDisabled.bind(this);
     }
 
     onChangeName(e) {
@@ -16,6 +17,10 @@ export default class RecipeForm extends Component {
     }
     onChangeRecipeURL(e) {
         this.props.onChangeRecipeURL(e.target.value);
+    }
+
+    onChangeDisabled(e) {
+        this.props.onChangeDisabled(e.target.checked);
     }
 
     render() {
@@ -51,6 +56,16 @@ export default class RecipeForm extends Component {
                             id="recipeURL"
                             value={props.recipeURL || ''}
                             onChange={this.onChangeRecipeURL}
+                        />
+                    </div>
+                    <div className={"form-check"}>
+                        <label htmlFor="disabled" className="form-check-label">Disabled</label>
+                        <input
+                            type="checkbox"
+                            className="form-check-input"
+                            id="disabled"
+                            value={props.disabled || ''}
+                            onChange={this.onChangeDisabled}
                         />
                     </div>
                 </form>

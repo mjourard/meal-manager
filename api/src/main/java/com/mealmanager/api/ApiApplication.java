@@ -28,7 +28,9 @@ public class ApiApplication {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 logger.info("Allowing the following origin on /api/**: " + corsAllowedOrigin);
-                registry.addMapping("/api/**").allowedOrigins(corsAllowedOrigin);
+                registry.addMapping("/api/**")
+                        .allowedMethods("*")
+                        .allowedOrigins(corsAllowedOrigin);
             }
         };
     }

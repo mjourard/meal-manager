@@ -17,6 +17,7 @@ export default class AddRecipe extends Component {
         this.onChangeName = this.onChangeName.bind(this);
         this.onChangeDescription = this.onChangeDescription.bind(this);
         this.onChangeRecipeURL = this.onChangeRecipeURL.bind(this);
+        this.onChangeDisabled = this.onChangeDisabled.bind(this);
         this.saveRecipe = this.saveRecipe.bind(this);
         this.newRecipe = this.newRecipe.bind(this);
         this.onUploadChange = this.onUploadChange.bind(this);
@@ -35,7 +36,8 @@ export default class AddRecipe extends Component {
         return {
             name: "",
             description: "",
-            recipeURL: ""
+            recipeURL: "",
+            disabled: false
         }
     }
 
@@ -57,11 +59,18 @@ export default class AddRecipe extends Component {
         })
     }
 
+    onChangeDisabled(disabled) {
+        this.setState({
+            disabled: disabled
+        });
+    }
+
     saveRecipe() {
         let data = {
             name: this.state.name,
             description: this.state.description,
-            recipeURL: this.state.recipeURL
+            recipeURL: this.state.recipeURL,
+            disabled: this.state.disabled
         };
 
         RecipesDataService.create(data)
@@ -82,6 +91,7 @@ export default class AddRecipe extends Component {
             name: "",
             description: "",
             recipeURL: "",
+            disabled: false
         });
     }
 
@@ -130,6 +140,7 @@ export default class AddRecipe extends Component {
                             name={newRecipe.name}
                             description={newRecipe.description}
                             recipeURL={newRecipe.recipeURL}
+                            disabled={newRecipe.disabled}
                         />
                     </div>
                 ) : ""}
@@ -138,9 +149,11 @@ export default class AddRecipe extends Component {
                         name={this.state.name}
                         description={this.state.description}
                         recipeURL={this.state.recipeURL}
+                        disabled={this.state.disabled}
                         onChangeName={this.onChangeName}
                         onChangeDescription={this.onChangeDescription}
                         onChangeRecipeURL={this.onChangeRecipeURL}
+                        onChangeDisabled={this.onChangeDisabled}
                     />
 
                     <button onClick={this.saveRecipe} className="btn btn-success">
