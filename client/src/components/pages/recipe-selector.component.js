@@ -17,6 +17,7 @@ export default class RecipeSelector extends Component {
         this.handleUserChange = this.handleUserChange.bind(this);
         this.onChangeAddAdditionalMessage = this.onChangeAddAdditionalMessage.bind(this);
         this.submit = this.submit.bind(this);
+        this.removeRecipe = this.removeRecipe.bind(this);
 
         this.state = {
             recipes: [],
@@ -145,6 +146,14 @@ export default class RecipeSelector extends Component {
         this.addRecipeSelection(goodRecipe);
     }
 
+    removeRecipe(recipe, index) {
+        let newRecipes = this.state.selectedRecipes;
+        newRecipes.splice(index, 1);
+        this.setState({
+            selectedRecipes: newRecipes
+        });
+    }
+
     render() {
         const {recipes, selectedRecipes, users} = this.state;
 
@@ -178,6 +187,7 @@ export default class RecipeSelector extends Component {
                     </div>
                     <RecipesList
                         recipes={selectedRecipes}
+                        removeRecipe={this.removeRecipe}
                     />
                     <form>
                         <h4>Send Meal List to These Users:</h4>
