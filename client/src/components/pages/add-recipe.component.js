@@ -1,5 +1,6 @@
 import {Component} from "react";
 import RecipesDataService from "../../services/recipes.service";
+import ToastsService from "../../services/toasts.service";
 import RecipeForm from "../recipe-form.component";
 import RecipeReadonly from "../recipe-readonly.component";
 import CsvUpload from "../csv-upload.component";
@@ -17,6 +18,7 @@ export default class AddRecipe extends Component {
         this.onChangeName = this.onChangeName.bind(this);
         this.onChangeDescription = this.onChangeDescription.bind(this);
         this.onChangeRecipeURL = this.onChangeRecipeURL.bind(this);
+        this.onChangeDisabled = this.onChangeDisabled.bind(this);
         this.saveRecipe = this.saveRecipe.bind(this);
         this.newRecipe = this.newRecipe.bind(this);
         this.onUploadChange = this.onUploadChange.bind(this);
@@ -35,7 +37,8 @@ export default class AddRecipe extends Component {
         return {
             name: "",
             description: "",
-            recipeURL: ""
+            recipeURL: "",
+            disabled: false
         }
     }
 
@@ -57,11 +60,18 @@ export default class AddRecipe extends Component {
         })
     }
 
+    onChangeDisabled(disabled) {
+        this.setState({
+            disabled: disabled
+        });
+    }
+
     saveRecipe() {
         let data = {
             name: this.state.name,
             description: this.state.description,
-            recipeURL: this.state.recipeURL
+            recipeURL: this.state.recipeURL,
+            disabled: this.state.disabled
         };
 
         RecipesDataService.create(data)
@@ -73,7 +83,7 @@ export default class AddRecipe extends Component {
                 this.newRecipe();
             })
             .catch(e => {
-                console.log(e);
+                ToastsService.webError("Create recipe failed", e);
             });
     }
 
@@ -82,6 +92,7 @@ export default class AddRecipe extends Component {
             name: "",
             description: "",
             recipeURL: "",
+            disabled: false
         });
     }
 
@@ -92,8 +103,7 @@ export default class AddRecipe extends Component {
     }
     onSaveMultiple(disableCallback) {
         if (this.state.recipeFile === null ) {
-            //TODO: toast - no file selected
-            console.log('no file selected')
+            ToastsService.warn("No file selected", "No file was selected for multi-recipe upload. How did you even trigger this??");
             return;
         }
         //upload
@@ -106,7 +116,7 @@ export default class AddRecipe extends Component {
                 this.newRecipe();
             })
             .catch(e => {
-                console.log(e);
+                ToastsService.webError("Upload failed", e);
             });
 
         //cleanup
@@ -130,6 +140,7 @@ export default class AddRecipe extends Component {
                             name={newRecipe.name}
                             description={newRecipe.description}
                             recipeURL={newRecipe.recipeURL}
+                            disabled={newRecipe.disabled}
                         />
                     </div>
                 ) : ""}
@@ -138,9 +149,11 @@ export default class AddRecipe extends Component {
                         name={this.state.name}
                         description={this.state.description}
                         recipeURL={this.state.recipeURL}
+                        disabled={this.state.disabled}
                         onChangeName={this.onChangeName}
                         onChangeDescription={this.onChangeDescription}
                         onChangeRecipeURL={this.onChangeRecipeURL}
+                        onChangeDisabled={this.onChangeDisabled}
                     />
 
                     <button onClick={this.saveRecipe} className="btn btn-success">

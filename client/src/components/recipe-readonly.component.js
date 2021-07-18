@@ -21,6 +21,12 @@ const RecipeReadonly = (props) => {
                 </label>{" "}
                 <a href={props.recipeURL} target={"_blank"} rel="noreferrer">{props.recipeURL}</a>
             </div>
+            <div>
+                <label>
+                    <strong>Disabled</strong>
+                </label>
+                <input type="checkbox" disabled checked={props.disabled} />
+            </div>
 
             <Link
                 to={"/recipes/" + props.id}

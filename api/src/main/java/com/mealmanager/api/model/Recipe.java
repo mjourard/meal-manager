@@ -19,12 +19,17 @@ public class Recipe {
     @Column(name = "recipeurl", nullable = true)
     private String recipeURL;
 
+    @Column(name = "disabled", nullable = false)
+    @org.hibernate.annotations.ColumnDefault("false")
+    private boolean disabled;
+
     public Recipe() {}
 
-    public Recipe(String name, String description, String recipeURL) {
+    public Recipe(String name, String description, String recipeURL, boolean disabled) {
         this.name = name;
         this.description = description;
         this.recipeURL = recipeURL;
+        this.disabled = disabled;
     }
 
     public long getId() {
@@ -51,5 +56,13 @@ public class Recipe {
 
     public String getRecipeURL() {
         return this.recipeURL;
+    }
+
+    public boolean getDisabled() {
+        return this.disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
     }
 }

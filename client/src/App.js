@@ -9,6 +9,7 @@ import EditOrder from "./components/pages/edit-order.components";
 import DisplayUsers from "./components/pages/display-users.component";
 import EditUser from "./components/pages/edit-user.component";
 import AddUser from "./components/pages/add-user.component";
+import ToastContainer from "./components/utilities/toast-container.component";
 
 function App() {
   return (
@@ -45,7 +46,7 @@ function App() {
             </li>
           </div>
         </nav>
-
+        <ToastContainer />
         <div className="container mt-3">
           <Switch>
             <Route exact path={["/", "/recipes"]} component={DisplayRecipes} />

@@ -1,5 +1,6 @@
 import React, {Component} from "react";
 import RecipesDataService from "../../services/recipes.service";
+import ToastsService from "../../services/toasts.service";
 import RecipeForm from "../recipe-form.component";
 
 export default class EditRecipe extends Component {
@@ -8,6 +9,7 @@ export default class EditRecipe extends Component {
         this.onChangeName = this.onChangeName.bind(this);
         this.onChangeDescription = this.onChangeDescription.bind(this);
         this.onChangeRecipeURL = this.onChangeRecipeURL.bind(this);
+        this.onChangeDisabled = this.onChangeDisabled.bind(this);
         this.getRecipe = this.getRecipe.bind(this);
         this.updateRecipe = this.updateRecipe.bind(this);
         this.deleteRecipe = this.deleteRecipe.bind(this);
@@ -17,9 +19,9 @@ export default class EditRecipe extends Component {
                 id: null,
                 name: "",
                 description: "",
-                recipeURL: ""
-            },
-            message: ""
+                recipeURL: "",
+                disabled: false
+            }
         };
     }
 
@@ -54,6 +56,15 @@ export default class EditRecipe extends Component {
         }));
     }
 
+    onChangeDisabled(disabled) {
+        this.setState(prevState => ({
+            currentRecipe: {
+                ...prevState.currentRecipe,
+                disabled: disabled
+            }
+        }))
+    }
+
     getRecipe(id) {
         RecipesDataService.get(id)
             .then(response => {
@@ -62,7 +73,7 @@ export default class EditRecipe extends Component {
                 });
             })
             .catch(e => {
-                console.log(e);
+                ToastsService.webError("Failed to retrieve Recipe", e);
             });
     }
 
@@ -72,12 +83,10 @@ export default class EditRecipe extends Component {
             this.state.currentRecipe
         )
             .then(response => {
-                this.setState({
-                    message: "The recipe was updated successfully!"
-                });
+                ToastsService.success("Update Successful", "The recipe was updated successfully!");
             })
             .catch(e => {
-                console.log(e);
+                ToastsService.webError("Update failed", e);
             });
     }
 
@@ -87,7 +96,7 @@ export default class EditRecipe extends Component {
                 this.props.history.push('/recipes')
             })
             .catch(e => {
-                console.log(e);
+                ToastsService.webError("Delete failed", e);
             });
     }
 
@@ -102,9 +111,11 @@ export default class EditRecipe extends Component {
                             name={currentRecipe.name}
                             description={currentRecipe.description}
                             recipeURL={currentRecipe.recipeURL}
+                            disabled={currentRecipe.disabled}
                             onChangeName={this.onChangeName}
                             onChangeDescription={this.onChangeDescription}
                             onChangeRecipeURL={this.onChangeRecipeURL}
+                            onChangeDisabled={this.onChangeDisabled}
                         />
 
                         <button
@@ -121,7 +132,6 @@ export default class EditRecipe extends Component {
                         >
                             Update
                         </button>
-                        <p>{this.state.message}</p>
                     </div>
                 ) : (
                     <div>

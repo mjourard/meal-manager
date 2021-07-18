@@ -1,5 +1,6 @@
 import React, {Component} from "react";
 import UsersDataService from "../../services/users.service";
+import ToastsService from "../../services/toasts.service";
 import UserDetails from "../user-details.component";
 
 export default class EditUser extends Component {
@@ -69,7 +70,7 @@ export default class EditUser extends Component {
                 });
             })
             .catch(e => {
-                console.log(e);
+                ToastsService.webError("Failed to fetch User", e);
             });
     }
 
@@ -79,12 +80,10 @@ export default class EditUser extends Component {
             this.state.currentUser
         )
             .then(response => {
-                this.setState({
-                    message: "The user was updated successfully!"
-                });
+                ToastsService.success("Update successful", "Updated the user successfully!");
             })
             .catch(e => {
-                console.log(e);
+                ToastsService.webError("Failed to update User", e);
             });
     }
 
@@ -94,7 +93,7 @@ export default class EditUser extends Component {
                 this.props.history.push('/users')
             })
             .catch(e => {
-                console.log(e);
+                ToastsService.webError("Failed to delete User", e);
             });
     }
 
@@ -131,7 +130,6 @@ export default class EditUser extends Component {
                     >
                         Update
                     </button>
-                    <p>{this.state.message}</p>
                 </div>
             </div>
         );

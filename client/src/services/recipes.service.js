@@ -1,5 +1,6 @@
 import http from "../http-common";
 import Papa from 'papaparse';
+import ToastsService from "./toasts.service";
 
 class RecipesDataService {
     getAll() {
@@ -15,7 +16,6 @@ class RecipesDataService {
     }
 
     multiCreate(data) {
-        console.log(data);
         return new Promise((resolve, reject) => {
             Papa.parse(data, {
                 complete: resolve,
@@ -27,22 +27,27 @@ class RecipesDataService {
                 let temp = {
                     name: rawRecipe[0],
                     description: null,
-                    recipeurl: null
+                    recipeurl: null,
+                    disabled: false
                 };
                 temp.description = rawRecipe.length >= 2 ? rawRecipe[1] : null;
                 temp.recipeurl = rawRecipe.length >= 3 ? rawRecipe[2] : null;
+                temp.disabled = rawRecipe.length >= 4 ? rawRecipe[3] : false;
                 recipes.push(temp);
             })
             return http.post("/recipes/multiadd", recipes);
         }).catch(err => {
-            //TODO: toast
-            console.warn("Something went wrong when running papa parse: ", err)
+            ToastsService.webError("Import failed", err);
         })
 
     }
 
     update(id, data) {
         return http.put(`/recipes/${id}`, data);
+    }
+
+    disable(id) {
+        return http.put(`/recipes/disable/${id}`);
     }
 
     delete(id) {

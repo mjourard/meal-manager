@@ -2,6 +2,7 @@ import {Component} from "react";
 import RecipesDataService from "../../services/recipes.service";
 import OrdersDataService from "../../services/orders.service";
 import UsersDataService from "../../services/users.service";
+import ToastsService from "../../services/toasts.service";
 import RecipesList from "../recipes-list.component";
 
 export default class RecipeSelector extends Component {
@@ -11,7 +12,6 @@ export default class RecipeSelector extends Component {
         this.retrieveUsers = this.retrieveUsers.bind(this);
         this.refreshList = this.refreshList.bind(this);
         this.addRecipeSelection = this.addRecipeSelection.bind(this);
-        this.removeRecipeSelection = this.removeRecipeSelection.bind(this);
         this.addRandomRecipe = this.addRandomRecipe.bind(this);
         this.handleMessageChange = this.handleMessageChange.bind(this);
         this.handleUserChange = this.handleUserChange.bind(this);
@@ -35,10 +35,10 @@ export default class RecipeSelector extends Component {
 
     handleUserChange(user, event) {
         if (event.target.checked === true) {
-            console.log('adding user: ' + user.id);
+            ToastsService.info("Added user", "Added user with email " + user.email + " to the email list.");
             this.state.selectedUserIds.add(user.id)
         } else if (this.state.selectedUserIds.has(user.id)) {
-            console.log('deleting user: ' + user.id);
+            ToastsService.info("Removed user", "Removed user with email " + user.email + " from the email list.");
             this.state.selectedUserIds.delete(user.id)
         }
     }
@@ -59,9 +59,14 @@ export default class RecipeSelector extends Component {
         }
         OrdersDataService.create(data)
             .then(response => {
+                let id = '?';
+                if (!!response.data && !!response.data.id) {
+                    id = response.data.id;
+                }
+                ToastsService.success("New Order Submitted!", "Successfully created new order with id " + id );
             })
             .catch(e => {
-                console.log(e);
+                ToastsService.webError("Error while creating Order", e);
             })
     }
 
@@ -78,8 +83,8 @@ export default class RecipeSelector extends Component {
                 });
             })
             .catch(e => {
-                console.log(e);
-            });
+                ToastsService.webError("Failed to retrieve Recipes", e);
+            })
     }
 
     retrieveUsers() {
@@ -95,7 +100,7 @@ export default class RecipeSelector extends Component {
                 })
             })
             .catch(e => {
-                console.log(e);
+                ToastsService.webError("Failed to retrieve Users", e);
             });
     }
 
@@ -113,16 +118,6 @@ export default class RecipeSelector extends Component {
         this.setState({
             selectedRecipes: newRecipes
         });
-    }
-
-    removeRecipeSelection() {
-        RecipesDataService.deleteAll()
-            .then(response => {
-                this.refreshList();
-            })
-            .catch(e => {
-                console.log(e);
-            });
     }
 
     addRandomRecipe() {
