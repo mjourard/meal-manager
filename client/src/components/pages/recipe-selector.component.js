@@ -25,7 +25,8 @@ export default class RecipeSelector extends Component {
             users: [],
             selectedUserIds: new Set(),
             message: "",
-            showMessageBox: false
+            showMessageBox: false,
+            processing: false
         };
     }
 
@@ -51,6 +52,9 @@ export default class RecipeSelector extends Component {
     }
 
     submit() {
+        this.setState({
+            processing: true
+        })
         let data = {
             selectedRecipes: this.state.selectedRecipes.map(recipe => recipe.id),
             selectedUserIds: Array.from(this.state.selectedUserIds)
@@ -72,6 +76,11 @@ export default class RecipeSelector extends Component {
             })
             .catch(e => {
                 ToastsService.webError("Error while creating Order", e);
+            })
+            .finally(() => {
+                this.setState({
+                    processing: false
+                })
             })
     }
 
@@ -219,7 +228,7 @@ export default class RecipeSelector extends Component {
                                           value={this.state.message} onChange={this.handleMessageChange}/>
                             </div>
                         : ""}
-                        <button type={"button"} className={"btn btn-primary"} onClick={this.submit} disabled={this.state.selectedRecipes.length < 1 || this.state.selectedUserIds.size === 0}>
+                        <button type={"button"} className={"btn btn-primary"} onClick={this.submit} disabled={this.state.selectedRecipes.length < 1 || this.state.selectedUserIds.size === 0 || this.state.processing}>
                             Submit
                         </button>
                     </form>
