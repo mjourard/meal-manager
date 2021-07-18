@@ -41,6 +41,7 @@ export default class RecipeSelector extends Component {
             ToastsService.info("Removed user", "Removed user with email " + user.email + " from the email list.");
             this.state.selectedUserIds.delete(user.id)
         }
+        this.setState({selectedUserIds: this.state.selectedUserIds});
     }
 
     onChangeAddAdditionalMessage(e) {
@@ -64,6 +65,10 @@ export default class RecipeSelector extends Component {
                     id = response.data.id;
                 }
                 ToastsService.success("New Order Submitted!", "Successfully created new order with id " + id );
+                this.setState({
+                    selectedRecipes: [],
+                    message: ""
+                });
             })
             .catch(e => {
                 ToastsService.webError("Error while creating Order", e);
@@ -98,6 +103,7 @@ export default class RecipeSelector extends Component {
                         this.state.selectedUserIds.add(user.id);
                     }
                 })
+                this.setState({selectedUserIds: this.state.selectedUserIds});
             })
             .catch(e => {
                 ToastsService.webError("Failed to retrieve Users", e);
@@ -113,10 +119,9 @@ export default class RecipeSelector extends Component {
     }
 
     addRecipeSelection(recipe) {
-        let newRecipes = this.state.selectedRecipes;
-        newRecipes.push(recipe);
+        this.state.selectedRecipes.push(recipe);
         this.setState({
-            selectedRecipes: newRecipes
+            selectedRecipes: this.state.selectedRecipes
         });
     }
 
@@ -142,10 +147,9 @@ export default class RecipeSelector extends Component {
     }
 
     removeRecipe(recipe, index) {
-        let newRecipes = this.state.selectedRecipes;
-        newRecipes.splice(index, 1);
+        this.state.selectedRecipes.splice(index, 1);
         this.setState({
-            selectedRecipes: newRecipes
+            selectedRecipes: this.state.selectedRecipes
         });
     }
 
@@ -215,7 +219,7 @@ export default class RecipeSelector extends Component {
                                           value={this.state.message} onChange={this.handleMessageChange}/>
                             </div>
                         : ""}
-                        <button type={"button"} className={"btn btn-primary"} onClick={this.submit}>
+                        <button type={"button"} className={"btn btn-primary"} onClick={this.submit} disabled={this.state.selectedRecipes.length < 1 || this.state.selectedUserIds.size === 0}>
                             Submit
                         </button>
                     </form>
