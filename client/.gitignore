@@ -21,3 +21,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# env files to be excluded from the repo that can be used for further customization
+.env.*.local
