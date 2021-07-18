@@ -1,5 +1,6 @@
 import {Component} from "react";
 import UsersDataService from "../../services/users.service";
+import ToastsService from "../../services/toasts.service";
 import UserDetails from "../user-details.component";
 
 export default class AddUser extends Component {
@@ -68,7 +69,7 @@ export default class AddUser extends Component {
                 this.newUser();
             })
             .catch(e => {
-                console.log(e);
+                ToastsService.webError("Create failed", e);
             });
     }
 

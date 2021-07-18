@@ -1,5 +1,6 @@
 import { Component } from "react";
 import RecipesDataService from "../../services/recipes.service";
+import ToastsService from "../../services/toasts.service";
 import RecipesList from "../recipes-list.component";
 
 export default class DisplayRecipes extends Component {
@@ -27,7 +28,7 @@ export default class DisplayRecipes extends Component {
                 });
             })
             .catch(e => {
-                console.log(e);
+                ToastsService.webError("Failed to fetch Recipes", e)
             });
     }
 
@@ -40,7 +41,7 @@ export default class DisplayRecipes extends Component {
                 this.refreshList();
             })
             .catch(e => {
-                console.log(e);
+                ToastsService.webError("Failed to disable Recipe", e);
             })
     }
 
@@ -50,7 +51,7 @@ export default class DisplayRecipes extends Component {
                 this.refreshList();
             })
             .catch(e => {
-                console.log(e);
+                ToastsService.webError("Failed to delete all Recipes", e);
             });
     }
 

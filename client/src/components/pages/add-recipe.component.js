@@ -1,5 +1,6 @@
 import {Component} from "react";
 import RecipesDataService from "../../services/recipes.service";
+import ToastsService from "../../services/toasts.service";
 import RecipeForm from "../recipe-form.component";
 import RecipeReadonly from "../recipe-readonly.component";
 import CsvUpload from "../csv-upload.component";
@@ -82,7 +83,7 @@ export default class AddRecipe extends Component {
                 this.newRecipe();
             })
             .catch(e => {
-                console.log(e);
+                ToastsService.webError("Create recipe failed", e);
             });
     }
 
@@ -102,8 +103,7 @@ export default class AddRecipe extends Component {
     }
     onSaveMultiple(disableCallback) {
         if (this.state.recipeFile === null ) {
-            //TODO: toast - no file selected
-            console.log('no file selected')
+            ToastsService.warn("No file selected", "No file was selected for multi-recipe upload. How did you even trigger this??");
             return;
         }
         //upload
@@ -116,7 +116,7 @@ export default class AddRecipe extends Component {
                 this.newRecipe();
             })
             .catch(e => {
-                console.log(e);
+                ToastsService.webError("Upload failed", e);
             });
 
         //cleanup

@@ -1,5 +1,6 @@
 import { Component } from "react";
 import OrdersDataService from "../../services/orders.service";
+import ToastsService from "../../services/toasts.service";
 import Table from "../table.component";
 import {Link} from "react-router-dom";
 //import OrdersList from "../orders-list.component";
@@ -23,16 +24,18 @@ export default class DisplayOrders extends Component {
         OrdersDataService.getAll()
             .then(response => {
                 let orders = [];
-                response.data.forEach(order => {
-                    order["Edit Link"] = <Link to={"/myorders/" + order.id}>Edit</Link>;
-                    orders.push(order);
-                })
+                if (response.data) {
+                    response.data.forEach(order => {
+                        order["Edit Link"] = <Link to={"/myorders/" + order.id}>Edit</Link>;
+                        orders.push(order);
+                    })
+                }
                 this.setState({
                     orders: orders
                 });
             })
             .catch(e => {
-                console.log(e);
+                ToastsService.webError("Failed to retrieve all Orders", e);
             });
     }
 

@@ -62,7 +62,7 @@ export default class UserDetails extends Component {
                             type="checkbox"
                             className="form-check-input"
                             id="default-checked"
-                            value={props.defaultChecked || false}
+                            checked={props.defaultChecked || false}
                             onChange={this.onChangeDefaultChecked}
                         />
                         <label htmlFor="default-checked" className={"form-check-label"}>Default Checked (if the user is checked by default on the "Choose Recipes" screen)</label>

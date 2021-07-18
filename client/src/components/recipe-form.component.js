@@ -64,7 +64,7 @@ export default class RecipeForm extends Component {
                             type="checkbox"
                             className="form-check-input"
                             id="disabled"
-                            value={props.disabled || ''}
+                            checked={props.disabled || false}
                             onChange={this.onChangeDisabled}
                         />
                     </div>

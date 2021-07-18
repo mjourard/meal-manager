@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import UsersDataService from "../../services/users.service";
+import ToastsService from "../../services/toasts.service";
 import Table from "../table.component";
 import {Link} from "react-router-dom";
 
@@ -32,7 +33,8 @@ export default class DisplayUsers extends Component {
                 });
             })
             .catch(e => {
-                console.log(e);
+                ToastsService.webError("Failed to fetch Users", e);
+
             });
     }
 

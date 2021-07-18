@@ -1,5 +1,6 @@
 import http from "../http-common";
 import Papa from 'papaparse';
+import ToastsService from "./toasts.service";
 
 class RecipesDataService {
     getAll() {
@@ -15,7 +16,6 @@ class RecipesDataService {
     }
 
     multiCreate(data) {
-        console.log(data);
         return new Promise((resolve, reject) => {
             Papa.parse(data, {
                 complete: resolve,
@@ -37,8 +37,7 @@ class RecipesDataService {
             })
             return http.post("/recipes/multiadd", recipes);
         }).catch(err => {
-            //TODO: toast
-            console.warn("Something went wrong when running papa parse: ", err)
+            ToastsService.webError("Import failed", err);
         })
 
     }

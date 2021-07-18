@@ -1,5 +1,6 @@
 import { Component } from "react";
 import OrdersDataService from "../../services/orders.service";
+import ToastsService from "../../services/toasts.service";
 import OrderDetails from "../order-details.component";
 
 export default class EditOrder extends Component {
@@ -27,7 +28,7 @@ export default class EditOrder extends Component {
                 });
             })
             .catch(e => {
-                console.log(e);
+                ToastsService.webError("Failed to fetch Order", e);
             });
     }
 
