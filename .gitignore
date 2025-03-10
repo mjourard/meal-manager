@@ -1,4 +1,5 @@
 .idea
 .env
+local.*.env
 .env.api
 .env.reciever
