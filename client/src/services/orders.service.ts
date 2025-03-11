@@ -1,4 +1,4 @@
-import http from "../http-common";
+import http from "./client";
 
 class OrdersDataService {
     create(data) {
@@ -9,7 +9,7 @@ class OrdersDataService {
         return http.get("/orders");
     }
 
-    get(id) {
+    get(id: number) {
         return http.get(`/orders/${id}`);
     }
 }

@@ -1,37 +1,39 @@
+import { type IconBackgroundClass } from "../components/utilities/toasts.component";
+
 class ToastsService {
-    info(title, message) {
+    info(title: string, message: string) {
         this._addToast(title, message, 'bg-info');
     }
 
-    success(title, message) {
+    success(title: string, message: string) {
         this._addToast(title, message, 'bg-success');
     }
 
-    warn(title, message) {
+    warn(title: string, message: string) {
         this._addToast(title, message, 'bg-warning');
     }
 
-    danger(title, message) {
+    danger(title: string, message: string) {
         this._addToast(title, message, 'bg-danger');
     }
 
-    primary(title, message) {
+    primary(title: string, message: string) {
         this._addToast(title, message, 'bg-primary');
     }
 
-    secondary(title, message) {
+    secondary(title: string, message: string) {
         this._addToast(title, message, 'bg-secondary');
     }
 
-    light(title, message) {
+    light(title: string, message: string) {
         this._addToast(title, message, 'bg-light');
     }
 
-    dark(title, message) {
+    dark(title: string, message: string) {
         this._addToast(title, message, 'bg-dark');
     }
 
-    webError(title, error) {
+    webError(title: string, error: Error) {
         let message = "An unknown error has occurred. Please contact support.";
         if (!!error.message) {
             // a network error on firefox
@@ -45,7 +47,7 @@ class ToastsService {
         this.danger(title, message);
     }
 
-    _addToast(title, message, iconBg) {
+    _addToast(title: string, message: string, iconBg: IconBackgroundClass) {
         if (this._toastsAvailable()) {
             window.toastContainer.addToast(title, message, iconBg);
         }

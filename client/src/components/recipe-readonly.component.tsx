@@ -1,6 +1,13 @@
 import {Link} from "react-router-dom";
 
-const RecipeReadonly = (props) => {
+export type RecipeReadonlyProps = {
+    id: number;
+    name: string;
+    description?: string;
+    recipeURL?: string;
+    disabled: boolean;
+}
+const RecipeReadonly = (props: RecipeReadonlyProps) => {
     return (
         <div>
             <div>
