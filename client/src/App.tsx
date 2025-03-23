@@ -50,7 +50,6 @@ function App() {
           </div>
         </nav>
         <div className="container mt-3">
-            <h1>Hello</h1>
           <Routes> 
             <Route path="/" element={<DisplayRecipes />} />
             <Route path="/recipes" element={<DisplayRecipes />} />
