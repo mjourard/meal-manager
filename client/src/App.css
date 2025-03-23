@@ -31,19 +31,14 @@
   }
 }
 
+#main-content {
+  padding-top: 60px;
+}
+
 .card {
   padding: 2em;
 }
 
 .read-the-docs {
   color: #888;
-}
-
-.container {
-  width: 100%;
-  max-width: 100%;
-  padding-right: 15px;
-  padding-left: 15px;
-  margin-right: auto;
-  margin-left: auto;
 }

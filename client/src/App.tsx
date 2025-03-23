@@ -17,7 +17,7 @@ import EditUser from "./components/pages/edit-user.component";
 function App() {
   return (
       <Router>
-        <nav className="navbar navbar-expand navbar-dark bg-dark">
+        <nav className="navbar fixed-top navbar-expand navbar-dark bg-dark">
           <a href={"/recipes"} className="navbar-brand">
             Meal Manager
           </a>
@@ -49,7 +49,7 @@ function App() {
             </li>
           </div>
         </nav>
-        <div className="container mt-3">
+        <div className="container mt-3" id="main-content">
           <Routes> 
             <Route path="/" element={<DisplayRecipes />} />
             <Route path="/recipes" element={<DisplayRecipes />} />

@@ -88,14 +88,6 @@ html, body {
   flex-direction: column;
 }
 
-.navbar {
-  width: 100%;
-  margin-bottom: 0;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  padding-left: 16px;
-}
 
 .main-content {
   flex: 1;
