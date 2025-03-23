@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RecipesDataService from '../../services/recipes.service';
 import { CreateRecipe } from '../../models/recipe';
+import { InfoCircle, ChevronDown, ChevronUp } from 'react-bootstrap-icons';
 
 const AddRecipe: React.FC = () => {
   const initialRecipeState: CreateRecipe = {
@@ -17,6 +18,15 @@ const AddRecipe: React.FC = () => {
   const [batchSubmitted, setBatchSubmitted] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  
+  // State for expanded field descriptions
+  const [expandedFields, setExpandedFields] = useState<Record<string, boolean>>({
+    name: false,
+    description: false,
+    recipeURL: false,
+    disabled: false,
+    csvFile: false
+  });
   
   const navigate = useNavigate();
 
@@ -36,11 +46,17 @@ const AddRecipe: React.FC = () => {
     }
   };
 
+  const toggleFieldDescription = (field: string) => {
+    setExpandedFields({
+      ...expandedFields,
+      [field]: !expandedFields[field]
+    });
+  };
+
   const saveRecipe = async (e: FormEvent) => {
     e.preventDefault();
     
     try {
-      // Recipe is already properly typed as CreateRecipe
       await RecipesDataService.create(recipe);
       setSubmitted(true);
       setMessage('Recipe was created successfully!');
@@ -116,45 +132,91 @@ const AddRecipe: React.FC = () => {
           <div className="single-recipe-form mb-5">
             <h4>Add Recipe</h4>
             <form onSubmit={saveRecipe}>
-              <div className="form-group mb-3">
-            <label htmlFor="name">Name</label>
-            <input
-              type="text"
-              className="form-control"
-              id="name"
+              <div className="mb-3">
+                <label htmlFor="name" className="form-label fw-bold text-start d-block">
+                  Recipe Name
+                  <span 
+                    className="ms-2 text-secondary" 
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => toggleFieldDescription('name')}
+                  >
+                    <InfoCircle className="me-1" />
+                    {expandedFields.name ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="name"
                   name="name"
                   value={recipe.name}
                   onChange={handleInputChange}
-              required
-            />
-          </div>
+                  required
+                />
+                {expandedFields.name && (
+                  <div className="form-text mt-2">
+                    Enter the full name of the recipe. This will be displayed in the recipe list and used for searching.
+                  </div>
+                )}
+              </div>
 
-              <div className="form-group mb-3">
-            <label htmlFor="description">Description</label>
+              <div className="mb-3">
+                <label htmlFor="description" className="form-label fw-bold text-start d-block">
+                  Description
+                  <span 
+                    className="ms-2 text-secondary" 
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => toggleFieldDescription('description')}
+                  >
+                    <InfoCircle className="me-1" />
+                    {expandedFields.description ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                  </span>
+                </label>
                 <textarea
-              className="form-control"
-              id="description"
+                  className="form-control"
+                  id="description"
                   name="description"
                   value={recipe.description || ''}
-              onChange={handleInputChange}
-            />
-          </div>
+                  onChange={handleInputChange}
+                  rows={3}
+                />
+                {expandedFields.description && (
+                  <div className="form-text mt-2">
+                    Provide a brief description of the recipe, including key ingredients or special preparation notes.
+                  </div>
+                )}
+              </div>
 
-              <div className="form-group mb-3">
-                <label htmlFor="recipeURL">Recipe URL</label>
-            <input
-              type="text"
-              className="form-control"
+              <div className="mb-3">
+                <label htmlFor="recipeURL" className="form-label fw-bold text-start d-block">
+                  Recipe URL
+                  <span 
+                    className="ms-2 text-secondary" 
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => toggleFieldDescription('recipeURL')}
+                  >
+                    <InfoCircle className="me-1" />
+                    {expandedFields.recipeURL ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
                   id="recipeURL"
                   name="recipeURL"
                   value={recipe.recipeURL || ''}
-              onChange={handleInputChange}
-            />
-          </div>
+                  onChange={handleInputChange}
+                />
+                {expandedFields.recipeURL && (
+                  <div className="form-text mt-2">
+                    Paste the full URL to the online recipe, if available. A snapshot of the page will be taken and archived for later viewing.
+                  </div>
+                )}
+              </div>
 
-              <div className="form-group mb-3">
+              <div className="mb-3">
                 <div className="form-check">
-            <input
+                  <input
                     type="checkbox"
                     className="form-check-input"
                     id="disabled"
@@ -162,10 +224,23 @@ const AddRecipe: React.FC = () => {
                     checked={recipe.disabled}
                     onChange={handleCheckboxChange}
                   />
-                  <label className="form-check-label" htmlFor="disabled">
+                  <label className="form-check-label fw-bold" htmlFor="disabled">
                     Disabled
+                    <span 
+                      className="ms-2 text-secondary" 
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => toggleFieldDescription('disabled')}
+                    >
+                      <InfoCircle className="me-1" />
+                      {expandedFields.disabled ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                    </span>
                   </label>
                 </div>
+                {expandedFields.disabled && (
+                  <div className="form-text mt-2">
+                    Check this box if you want to temporarily disable this recipe from appearing in searches or being selected for orders.
+                  </div>
+                )}
               </div>
 
               <button type="submit" className="btn btn-success">
@@ -177,17 +252,33 @@ const AddRecipe: React.FC = () => {
           <div className="csv-upload-form">
             <h4>Bulk Add Recipes from CSV</h4>
             <form onSubmit={uploadCSV}>
-              <div className="form-group mb-3">
-                <label htmlFor="csvFile">CSV File</label>
-            <input
+              <div className="mb-3">
+                <label htmlFor="csvFile" className="form-label fw-bold text-start d-block">
+                  CSV File
+                  <span 
+                    className="ms-2 text-secondary" 
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => toggleFieldDescription('csvFile')}
+                  >
+                    <InfoCircle className="me-1" />
+                    {expandedFields.csvFile ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                  </span>
+                </label>
+                <input
                   type="file"
-              className="form-control"
+                  className="form-control"
                   id="csvFile"
                   accept=".csv"
                   onChange={handleFileChange}
-              required
+                  required
                 />
-                <small className="form-text text-muted">
+                {expandedFields.csvFile && (
+                  <div className="form-text mt-2">
+                    Upload a CSV file with the following columns: Name, Description, URL, Disabled (true/false).
+                    Each row will create a new recipe. The first column (Name) is required, all others are optional.
+                  </div>
+                )}
+                <small className="text-muted d-block mt-2">
                   CSV format: Name, Description, URL, Disabled (true/false)
                 </small>
               </div>
@@ -197,7 +288,7 @@ const AddRecipe: React.FC = () => {
               </button>
             </form>
           </div>
-
+          
           {message && (
             <div className="alert alert-success mt-3">
               {message}
