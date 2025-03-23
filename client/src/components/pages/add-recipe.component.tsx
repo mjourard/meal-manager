@@ -1,164 +1,214 @@
-import React, { useState } from 'react';
-// TODO: Migrate the recipe service to TypeScript
-// For now, we'll import from the JS file
-import RecipeDataService from '../../services/recipes.service';
-
-// Define interfaces for the recipe data
-interface RecipeData {
-  id: number | null;
-  name: string;
-  description: string;
-  ingredients: string;
-  instructions: string;
-  servings: number;
-  published: boolean;
-}
-
-interface RecipeFormState extends RecipeData {
-  submitted: boolean;
-}
+import React, { useState, ChangeEvent, FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
+import RecipesDataService from '../../services/recipes.service';
+import { CreateRecipe } from '../../models/recipe';
 
 const AddRecipe: React.FC = () => {
-  // Convert class state to useState hook
-  const [formState, setFormState] = useState<RecipeFormState>({
-    id: null,
+  const initialRecipeState: CreateRecipe = {
     name: '',
     description: '',
-    ingredients: '',
-    instructions: '',
-    servings: 1,
-    published: false,
-    submitted: false
-  });
-
-  // Convert class methods to regular functions
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormState(prevState => ({
-      ...prevState,
-      [name]: name === 'servings' ? Number(value) : value
-    }));
+    recipeURL: '',
+    disabled: false
   };
 
-  const saveRecipe = async () => {
-    const data: Omit<RecipeData, 'id' | 'published'> = {
-      name: formState.name,
-      description: formState.description,
-      ingredients: formState.ingredients,
-      instructions: formState.instructions,
-      servings: formState.servings
-    };
+  const [recipe, setRecipe] = useState<CreateRecipe>(initialRecipeState);
+  const [submitted, setSubmitted] = useState<boolean>(false);
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [batchSubmitted, setBatchSubmitted] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
+  
+  const navigate = useNavigate();
 
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = event.target;
+    setRecipe({ ...recipe, [name]: value });
+  };
+
+  const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = event.target;
+    setRecipe({ ...recipe, [name]: checked });
+  };
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setCsvFile(event.target.files[0]);
+    }
+  };
+
+  const saveRecipe = async (e: FormEvent) => {
+    e.preventDefault();
+    
     try {
-      const response = await RecipeDataService.create(data);
-      setFormState({
-        id: response.data.id,
-        name: response.data.name,
-        description: response.data.description,
-        ingredients: response.data.ingredients,
-        instructions: response.data.instructions,
-        servings: response.data.servings,
-        published: response.data.published,
-        submitted: true
-      });
-      console.log(response.data);
-    } catch (e) {
-      console.log(e);
+      // Recipe is already properly typed as CreateRecipe
+      await RecipesDataService.create(recipe);
+      setSubmitted(true);
+      setMessage('Recipe was created successfully!');
+    } catch (error) {
+      console.error('Error creating recipe:', error);
+      setError('Failed to create recipe');
     }
   };
 
   const newRecipe = () => {
-    setFormState({
-      id: null,
-      name: '',
-      description: '',
-      ingredients: '',
-      instructions: '',
-      servings: 1,
-      published: false,
-      submitted: false
-    });
+    setRecipe(initialRecipeState);
+    setSubmitted(false);
+    setBatchSubmitted(false);
+    setError(null);
+    setMessage('');
+  };
+
+  const uploadCSV = async (e: FormEvent) => {
+    e.preventDefault();
+    
+    if (!csvFile) {
+      setError('Please select a CSV file first');
+      return;
+    }
+
+    try {
+      // Read the CSV file content
+      const reader = new FileReader();
+      
+      reader.onload = async (event) => {
+        if (event.target && event.target.result) {
+          const csvContent = event.target.result as string;
+          
+          try {
+            await RecipesDataService.multiCreate(csvContent);
+            setBatchSubmitted(true);
+            setMessage('Recipes were uploaded successfully!');
+          } catch (error) {
+            console.error('Error creating recipes from CSV:', error);
+            setError('Failed to create recipes from CSV');
+          }
+        }
+      };
+      
+      reader.onerror = () => {
+        setError('Error reading the CSV file');
+      };
+      
+      reader.readAsText(csvFile);
+    } catch (error) {
+      console.error('Error uploading CSV:', error);
+      setError('Failed to upload CSV');
+    }
   };
 
   return (
-    <div className="submit-form">
-      {formState.submitted ? (
+    <div className="add-recipe-container">
+      {submitted || batchSubmitted ? (
         <div>
-          <h4>You submitted successfully!</h4>
+          <h4>Recipe{batchSubmitted ? 's were' : ' was'} submitted successfully!</h4>
           <button className="btn btn-success" onClick={newRecipe}>
-            Add
+            Add Another
+          </button>
+          <button 
+            className="btn btn-primary ms-2" 
+            onClick={() => navigate('/recipes')}
+          >
+            Back to Recipes
           </button>
         </div>
       ) : (
         <div>
-          <div className="form-group">
+          <div className="single-recipe-form mb-5">
+            <h4>Add Recipe</h4>
+            <form onSubmit={saveRecipe}>
+              <div className="form-group mb-3">
             <label htmlFor="name">Name</label>
             <input
               type="text"
               className="form-control"
               id="name"
+                  name="name"
+                  value={recipe.name}
+                  onChange={handleInputChange}
               required
-              value={formState.name}
-              onChange={handleInputChange}
-              name="name"
             />
           </div>
 
-          <div className="form-group">
+              <div className="form-group mb-3">
             <label htmlFor="description">Description</label>
-            <input
-              type="text"
+                <textarea
               className="form-control"
               id="description"
-              required
-              value={formState.description}
+                  name="description"
+                  value={recipe.description || ''}
               onChange={handleInputChange}
-              name="description"
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="ingredients">Ingredients</label>
+              <div className="form-group mb-3">
+                <label htmlFor="recipeURL">Recipe URL</label>
             <input
               type="text"
               className="form-control"
-              id="ingredients"
-              required
-              value={formState.ingredients}
+                  id="recipeURL"
+                  name="recipeURL"
+                  value={recipe.recipeURL || ''}
               onChange={handleInputChange}
-              name="ingredients"
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="instructions">Instructions</label>
+              <div className="form-group mb-3">
+                <div className="form-check">
             <input
-              type="text"
-              className="form-control"
-              id="instructions"
-              required
-              value={formState.instructions}
-              onChange={handleInputChange}
-              name="instructions"
-            />
+                    type="checkbox"
+                    className="form-check-input"
+                    id="disabled"
+                    name="disabled"
+                    checked={recipe.disabled}
+                    onChange={handleCheckboxChange}
+                  />
+                  <label className="form-check-label" htmlFor="disabled">
+                    Disabled
+                  </label>
+                </div>
+              </div>
+
+              <button type="submit" className="btn btn-success">
+                Submit
+              </button>
+            </form>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="servings">Servings</label>
+          <div className="csv-upload-form">
+            <h4>Bulk Add Recipes from CSV</h4>
+            <form onSubmit={uploadCSV}>
+              <div className="form-group mb-3">
+                <label htmlFor="csvFile">CSV File</label>
             <input
-              type="number"
+                  type="file"
               className="form-control"
-              id="servings"
+                  id="csvFile"
+                  accept=".csv"
+                  onChange={handleFileChange}
               required
-              value={formState.servings}
-              onChange={handleInputChange}
-              name="servings"
-            />
+                />
+                <small className="form-text text-muted">
+                  CSV format: Name, Description, URL, Disabled (true/false)
+                </small>
+              </div>
+
+              <button type="submit" className="btn btn-success">
+                Upload
+              </button>
+            </form>
           </div>
 
-          <button onClick={saveRecipe} className="btn btn-success">
-            Submit
-          </button>
+          {message && (
+            <div className="alert alert-success mt-3">
+              {message}
+            </div>
+          )}
+          
+          {error && (
+            <div className="alert alert-danger mt-3">
+              {error}
+            </div>
+          )}
         </div>
       )}
     </div>

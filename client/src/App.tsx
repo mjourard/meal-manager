@@ -57,7 +57,7 @@ function App() {
             <Route path="/recipes/:id" element={<EditRecipe />} />
             <Route path="/choose-recipes" element={<RecipeSelector />} />
             <Route path="/orders" element={<DisplayOrders />} />
-            <Route path="/myorders/:id" element={<EditOrder />} />
+            <Route path="/orders/:id" element={<EditOrder />} />
             <Route path="/users" element={<DisplayUsers />} />
             <Route path="/myusers/:id" element={<EditUser />} />
           </Routes>

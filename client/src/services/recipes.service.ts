@@ -1,11 +1,15 @@
-import { Recipe } from "../models/recipe";
+import { CreateRecipe, UpdateRecipe, DisplayRecipe } from "../models/recipe";
 import http from "./client";
 import Papa from 'papaparse';
 
 class RecipesDataService {
-    async getAll(): Promise<Recipe[]> {
+    async getAll(): Promise<DisplayRecipe[]> {
         try {
             const response = await http.get("/recipes");
+            // Check for 204 No Content
+            if (response.status === 204) {
+                return [];
+            }
             return response.data;
         } catch (error) {
             if (error instanceof Error) {
@@ -16,7 +20,7 @@ class RecipesDataService {
         }
     }
 
-    async get(id: number): Promise<Recipe> {
+    async get(id: number): Promise<DisplayRecipe> {
         try {
             const response = await http.get(`/recipes/${id}`);
             return response.data;
@@ -29,7 +33,7 @@ class RecipesDataService {
         }
     }
 
-    async create(data: Recipe): Promise<Recipe> {
+    async create(data: CreateRecipe): Promise<DisplayRecipe> {
         try {
             const response = await http.post("/recipes", data);
             return response.data;
@@ -42,7 +46,20 @@ class RecipesDataService {
         }
     }
 
-    async multiCreate(data: string): Promise<Recipe[]> {
+    async update(id: number, data: UpdateRecipe): Promise<DisplayRecipe> {
+        try {
+            const response = await http.put(`/recipes/${id}`, data);
+            return response.data;
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new Error(`Failed to update Recipe with id ${id}: ${error.message}`, { cause: error });
+            } else {
+                throw new Error(`Failed to update Recipe with id ${id}: ${JSON.stringify(error)}`);
+            }
+        }
+    }
+
+    async multiCreate(data: string): Promise<DisplayRecipe[]> {
         try {
             const results: any = await new Promise((resolve, reject) => {
                 Papa.parse(data, {
@@ -51,7 +68,7 @@ class RecipesDataService {
                 });
             });
 
-            const recipes: Recipe[] = results.data.map((rawRecipe: any) => ({
+            const recipes: CreateRecipe[] = results.data.map((rawRecipe: any) => ({
                 name: rawRecipe[0],
                 description: rawRecipe.length >= 2 ? rawRecipe[1] : null,
                 recipeURL: rawRecipe.length >= 3 ? rawRecipe[2] : null,
@@ -77,6 +94,18 @@ class RecipesDataService {
                 throw new Error(`Failed to disable Recipe with id ${id}`, { cause: error });
             } else {
                 throw new Error(`Failed to disable Recipe with id ${id} ${JSON.stringify(error)}`);
+            }
+        }
+    }
+
+    async delete(id: number): Promise<void> {
+        try {
+            await http.delete(`/recipes/${id}`);
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new Error(`Failed to delete Recipe with id ${id}: ${error.message}`, { cause: error });
+            } else {
+                throw new Error(`Failed to delete Recipe with id ${id}: ${JSON.stringify(error)}`);
             }
         }
     }

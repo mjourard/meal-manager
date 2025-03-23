@@ -4,7 +4,7 @@ import http from "./client";
 class SysUsersDataService {
     async getAll(): Promise<SysUser[]> {
         try {
-            const response = await http.get("/sysusers");
+            const response = await http.get("/users");
             return response.data;
         } catch (error) {
             if (error instanceof Error) {
@@ -17,7 +17,7 @@ class SysUsersDataService {
 
     async get(id: number): Promise<SysUser> {
         try {
-            const response = await http.get(`/sysusers/${id}`);
+            const response = await http.get(`/users/${id}`);
             return response.data;
         } catch (error) {
             if (error instanceof Error) {
@@ -30,7 +30,7 @@ class SysUsersDataService {
 
     async create(data: SysUser): Promise<SysUser> {
         try {
-            const response = await http.post("/sysusers", data);
+            const response = await http.post("/users", data);
             return response.data;
         } catch (error) {
             if (error instanceof Error) {
@@ -43,7 +43,7 @@ class SysUsersDataService {
 
     async update(id: number, data: SysUser): Promise<SysUser> {
         try {
-            const response = await http.put(`/sysusers/${id}`, data);
+            const response = await http.put(`/users/${id}`, data);
             return response.data;
         } catch (error) {
             if (error instanceof Error) {
@@ -56,7 +56,7 @@ class SysUsersDataService {
 
     async delete(id: number): Promise<void> {
         try {
-            await http.delete(`/sysusers/${id}`);
+            await http.delete(`/users/${id}`);
         } catch (error) {
             if (error instanceof Error) {
                 throw new Error(`Failed to delete SysUser with id ${id}: ${error.message}`, { cause: error });
@@ -68,7 +68,7 @@ class SysUsersDataService {
 
     async updateDefaultChecked(id: number, defaultChecked: boolean): Promise<SysUser> {
         try {
-            const response = await http.put(`/sysusers/${id}/defaultchecked`, { defaultChecked });
+            const response = await http.put(`/users/${id}/defaultchecked`, { defaultChecked });
             return response.data;
         } catch (error) {
             if (error instanceof Error) {
