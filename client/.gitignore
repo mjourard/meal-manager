@@ -24,4 +24,5 @@ dist-ssr
 *.sw?
 
 # environment variables
-.env
+.env*
+!.env.dist
