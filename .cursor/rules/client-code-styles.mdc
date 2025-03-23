@@ -1,0 +1,11 @@
+---
+description: Code styles for the frontend
+globs: *.tsx,*.ts
+alwaysApply: false
+---
+
+# Your rule content
+
+- react components should favour functional components over class components
+- react components should be declared in their file. The filename should be the kebab-case version of the component's name
+- the names of the files containing react components always follow the pattern of <kebab-case-component-name>.component.tsx

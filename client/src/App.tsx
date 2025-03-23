@@ -5,15 +5,14 @@ import {
     BrowserRouter as Router, useParams
 } from "react-router-dom";
 
-// import AddRecipe from "./components/pages/add-recipe.component";
-// import EditRecipe from "./components/pages/edit-recipe.component";
+import AddRecipe from "./components/pages/add-recipe.component";
+import EditRecipe from "./components/pages/edit-recipe.component";
 import DisplayRecipes from "./components/pages/display-recipes.component";
-// import RecipeSelector from "./components/pages/recipe-selector.component";
-// import DisplayOrders from "./components/pages/display-orders.components";
-// import EditOrder from "./components/pages/edit-order.components";
-// import DisplayUsers from "./components/pages/display-users.component";
-// import EditUser from "./components/pages/edit-user.component";
-// import AddUser from "./components/pages/add-user.component";
+import RecipeSelector from "./components/pages/recipe-selector.component";
+import DisplayOrders from "./components/pages/display-orders.component";
+import EditOrder from "./components/pages/edit-order.component";
+import DisplayUsers from "./components/pages/display-users.component";
+import EditUser from "./components/pages/edit-user.component";
 
 function App() {
   return (
@@ -28,7 +27,7 @@ function App() {
                 Recipes
               </Link>
             </li>
-            {/* <li className="nav-item">
+            <li className="nav-item">
               <Link to={"/add"} className="nav-link">
                 Add
               </Link>
@@ -47,7 +46,7 @@ function App() {
               <Link to={"/users"} className={"nav-link"}>
                 Users
               </Link>
-            </li> */}
+            </li>
           </div>
         </nav>
         <div className="container mt-3">
@@ -55,14 +54,13 @@ function App() {
           <Routes> 
             <Route path="/" element={<DisplayRecipes />} />
             <Route path="/recipes" element={<DisplayRecipes />} />
-            {/* <Route exact path="/add" element={AddRecipe} />
-            <Route path="/recipes/:id" element={EditRecipe} />
-            <Route path="/choose-recipes" element={RecipeSelector} />
-            <Route path="/orders" element={DisplayOrders} />
-            <Route path="/myorders/:id" element={EditOrder} />
-            <Route path="/users" element={DisplayUsers} />
-            <Route path="/myusers/:id" element={EditUser} />
-            <Route path="/adduser" element={AddUser} />  */}
+            <Route path="/add" element={<AddRecipe />} />
+            <Route path="/recipes/:id" element={<EditRecipe />} />
+            <Route path="/choose-recipes" element={<RecipeSelector />} />
+            <Route path="/orders" element={<DisplayOrders />} />
+            <Route path="/myorders/:id" element={<EditOrder />} />
+            <Route path="/users" element={<DisplayUsers />} />
+            <Route path="/myusers/:id" element={<EditUser />} />
           </Routes>
         </div>
       </Router>
