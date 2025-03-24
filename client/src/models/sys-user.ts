@@ -1,4 +1,4 @@
-import { CreateType, UpdateType, DisplayType, ListItemType } from './utility-types';
+import { CreateType, UpdateType, DisplayType } from './utility-types';
 
 export interface SysUser {
     id: number;
@@ -11,4 +11,3 @@ export interface SysUser {
 export type CreateSysUser = CreateType<SysUser>;
 export type UpdateSysUser = UpdateType<SysUser>;
 export type DisplaySysUser = DisplayType<SysUser>;
-export type SysUserListItem = ListItemType<SysUser, 'firstName' | 'lastName' | 'email'>; 

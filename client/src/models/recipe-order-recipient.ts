@@ -1,4 +1,4 @@
-import { CreateType, UpdateType, DisplayType, ListItemType } from './utility-types';
+import { CreateType, UpdateType, DisplayType } from './utility-types';
 import { SysUser } from './sys-user';
 
 export interface RecipeOrderRecipient {
@@ -11,4 +11,3 @@ export interface RecipeOrderRecipient {
 export type CreateRecipeOrderRecipient = CreateType<RecipeOrderRecipient>;
 export type UpdateRecipeOrderRecipient = UpdateType<RecipeOrderRecipient>;
 export type DisplayRecipeOrderRecipient = DisplayType<RecipeOrderRecipient>;
-export type RecipeOrderRecipientListItem = ListItemType<RecipeOrderRecipient, 'userId'>; 

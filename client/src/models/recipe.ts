@@ -1,4 +1,4 @@
-import { CreateType, UpdateType, DisplayType, ListItemType } from './utility-types';
+import { CreateType, UpdateType, DisplayType } from './utility-types';
 
 export interface Recipe {
     id: number;
@@ -11,4 +11,3 @@ export interface Recipe {
 export type CreateRecipe = CreateType<Recipe>;
 export type UpdateRecipe = UpdateType<Recipe>;
 export type DisplayRecipe = DisplayType<Recipe>;
-export type RecipeListItem = ListItemType<Recipe, 'name' | 'disabled'>;
