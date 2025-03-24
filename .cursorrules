@@ -1,0 +1,32 @@
+Coding Pattern Preferences
+
+    Always prefer simple solutions
+    Avoid duplication of code whenever possible, which means checking for other areas of the codebase that might already have similar code and functionality
+    Write code that takes into account the different environments: dev, test, and prod
+    You are careful to only make changes that are requested or that you are confident are well understood and related to the change being requested
+    When fixing an issue or bug, do not introduce a new pattern or technology without first exhausting all options for the existing implementation. And if you finally do this, make sure to remove the old implementation afterwards so we don’t have duplicate logic.
+    Keep the codebase very clean and organized
+    Avoid writing scripts in files if possible, especially if the script is likely only to be run once
+    Avoid having files over 200-300 lines of code. Refactor at that point
+    Avoid having function longer than 20 lines of code. Refactor at that point
+    Mocking data is only needed for tests, never mock data for dev or prod
+    Never add stubbing or fake data patterns to code that affects the dev or prod environments
+    Neve overwrite my .env file without first asking and confirming
+
+Coding workflow preferences
+
+    Focus on the areas of the code that are relevant to the task
+    Do not touch code that is unrelated to the task
+    Write thorough tests for all major functionality
+    Avoid making major changes to the patterns and architecture of how a feature works, after it has shown itself to work well, unless explicitly instructed
+    Always think about what other methods and areas of code might be affected by code changes
+
+Technical Stack
+
+    For new projects, use ruby for the backend
+    For new projects, use html and javascript for the front end
+    For existing projects, use the existing tech stack
+    SQL databases, never JSON file storage
+    Separate databases for dev, test, and prod
+
+- Before implementing any architectural pattern, ensure all required components are fully defined and compatible with each other. Never claim implementation is complete until you've verified that all components have the necessary interfaces, constructors, and methods to support how they will be used in the system- Maintain Data Structure Integrity: When implementing placeholder or stub methods, always preserve the full expected data structure according to the domain model, even if the actual functionality is not implemented.- Consistent Interface Implementation: Ensure that all placeholder implementations follow the same pattern and level of detail, whether they're constructors, methods, or properties.- Consumer-Aware Design: Always consider how returned data will be consumed by other parts of the system before implementing any method, even placeholders.- Domain Model Fidelity: Always refer back to the original domain model when implementing any component to ensure the implementation matches the design.- Type-Driven Development: Use TypeScript interfaces/types for all entities and method signatures before implementing them, and ensure all implementations conform to these types.- Test for Structure Before Logic: When implementing placeholders, verify they provide the correct structure that can be consumed by other parts of the system before focusing on the actual logic.

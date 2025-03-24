@@ -1,0 +1,8 @@
+---
+description: Definitions of the server and client in this repo
+globs: *.ts, *.tsx
+alwaysApply: false
+---
+
+- Any references to 'the mm api' should assume that it refers to the API defined in this repo at the /api folder. It is a java springboot REST api
+- Any reference to 'the mm client' should assume that it refers to the react app defined in this repo at the /client folder. It is a react app that will make HTTP requests to the Springboot API to interact with the meal manager data.
