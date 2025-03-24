@@ -1,6 +1,5 @@
-import { RecipeOrder, CreateRecipeOrder, UpdateRecipeOrder, DisplayRecipeOrder } from "../models/recipe-order";
-import { RecipeOrderItem, DisplayRecipeOrderItem, CreateRecipeOrderItem } from "../models/recipe-order-item";
-import { RecipeOrderRecipient, DisplayRecipeOrderRecipient, CreateRecipeOrderRecipient } from "../models/recipe-order-recipient";
+import { DisplayRecipeOrder } from "../models/recipe-order";
+import { DisplayRecipeOrderDetails, CreateRecipeOrderDetails, CreateRecipeOrderResponse } from "../models/recipe-order-details";
 import http from "./client";
 
 class RecipeOrdersDataService {
@@ -21,20 +20,20 @@ class RecipeOrdersDataService {
         }
     }
 
-    async get(id: number): Promise<DisplayRecipeOrder> {
+    async get(id: number): Promise<DisplayRecipeOrderDetails> {
         try {
             const response = await http.get(`/orders/${id}`);
             return response.data;
         } catch (error) {
             if (error instanceof Error) {
-                throw new Error(`Failed to fetch RecipeOrder with id ${id}: ${error.message}`, { cause: error });
+                throw new Error(`Failed to fetch RecipeOrder details with id ${id}: ${error.message}`, { cause: error });
             } else {
-                throw new Error(`Failed to fetch RecipeOrder with id ${id}: ${JSON.stringify(error)}`);
+                throw new Error(`Failed to fetch RecipeOrder details with id ${id}: ${JSON.stringify(error)}`);
             }
         }
     }
 
-    async create(data: CreateRecipeOrder): Promise<DisplayRecipeOrder> {
+    async create(data: CreateRecipeOrderDetails): Promise<CreateRecipeOrderResponse> {
         try {
             const response = await http.post("/orders", data);
             return response.data;

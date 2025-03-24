@@ -52,3 +52,15 @@ export default tseslint.config({
   },
 })
 ```
+
+## 2025 React Upgrade and Typescript conversion
+
+For speed, the following functionality was cut that should be added back later
+* toasts
+* creating new orders
+
+As part of the upgrade, we're focusing on adding authentication first
+
+## Deployment
+
+Currently the react app is deployed in vercel, and it auto-builds on each commit to main.
