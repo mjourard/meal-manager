@@ -1,8 +1,9 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import RecipeOrdersDataService from '../../services/recipe-orders.service';
-import RecipesDataService from '../../services/recipes.service';
-import SysUsersDataService from '../../services/sys-users.service';
+import { useRecipeOrdersService } from '../../services/recipe-orders.service';
+import { useRecipesService } from '../../services/recipes.service';
+import { useSysUsersService } from '../../services/sys-users.service';
+import { useRecipeOrderItemsDataService } from '../../services/recipe-order-items.service';
 import { RecipeOrderDetails } from '../../models/recipe-order-details';
 import { DisplayRecipe } from '../../models/recipe';
 import { DisplaySysUser } from '../../models/sys-user';
@@ -14,6 +15,12 @@ const EditOrder: React.FC = () => {
     selectedUsers: [],
     message: ''
   };
+
+  // Services
+  const recipeOrdersService = useRecipeOrdersService();
+  const recipesService = useRecipesService();
+  const sysUsersService = useSysUsersService();
+  const recipeOrderItemsService = useRecipeOrderItemsDataService();
 
   const [currentOrder, setCurrentOrder] = useState<RecipeOrderDetails>(initialOrderState);
   const [availableRecipes, setAvailableRecipes] = useState<DisplayRecipe[]>([]);
@@ -39,10 +46,10 @@ const EditOrder: React.FC = () => {
 
   const loadRecipesAndUsers = async () => {
     try {
-      const recipesData = await RecipesDataService.getAll();
-      setAvailableRecipes(recipesData.filter(recipe => !recipe.disabled));
+      const recipesData = await recipesService.getAll();
+      setAvailableRecipes(recipesData.filter((recipe: DisplayRecipe) => !recipe.disabled));
       
-      const usersData = await SysUsersDataService.getAll();
+      const usersData = await sysUsersService.getAll();
       setAvailableUsers(usersData);
     } catch (error) {
       console.error('Error loading data:', error);
@@ -52,7 +59,7 @@ const EditOrder: React.FC = () => {
 
   const getOrder = async (id: number) => {
     try {
-      const orderData = await RecipeOrdersDataService.get(id);
+      const orderData = await recipeOrdersService.get(id);
       setCurrentOrder(orderData);
       setLoading(false);
     } catch (error) {
@@ -157,7 +164,7 @@ const EditOrder: React.FC = () => {
       };
 
       if (isNewOrder) {
-        await RecipeOrdersDataService.create(orderData);
+        await recipeOrdersService.create(orderData);
         setMessage('Order created successfully');
       } else {
         // If you implement update functionality in the future

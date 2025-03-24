@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import RecipesDataService from '../../services/recipes.service';
+import { useRecipesService } from '../../services/recipes.service';
 import { CreateRecipe } from '../../models/recipe';
 import { InfoCircle, ChevronDown, ChevronUp } from 'react-bootstrap-icons';
 
@@ -11,6 +11,8 @@ const AddRecipe: React.FC = () => {
     recipeURL: '',
     disabled: false
   };
+
+  const recipesService = useRecipesService();
 
   const [recipe, setRecipe] = useState<CreateRecipe>(initialRecipeState);
   const [submitted, setSubmitted] = useState<boolean>(false);
@@ -57,7 +59,7 @@ const AddRecipe: React.FC = () => {
     e.preventDefault();
     
     try {
-      await RecipesDataService.create(recipe);
+      await recipesService.create(recipe);
       setSubmitted(true);
       setMessage('Recipe was created successfully!');
     } catch (error) {
@@ -91,7 +93,7 @@ const AddRecipe: React.FC = () => {
           const csvContent = event.target.result as string;
           
           try {
-            await RecipesDataService.multiCreate(csvContent);
+            await recipesService.multiCreate(csvContent);
             setBatchSubmitted(true);
             setMessage('Recipes were uploaded successfully!');
           } catch (error) {

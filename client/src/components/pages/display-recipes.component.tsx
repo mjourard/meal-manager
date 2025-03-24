@@ -1,29 +1,30 @@
 import React, { useState, useEffect, useCallback } from "react";
-import RecipesDataService from "../../services/recipes.service";
+import { useRecipesService } from "../../services/recipes.service";
 import RecipesList from "../recipes-list.component";
 import { Recipe } from "../../models/recipe";
 
 const DisplayRecipes: React.FC = () => {
+    const recipesService = useRecipesService();
     const [recipes, setRecipes] = useState<Recipe[]>([]);
 
     const retrieveRecipes = useCallback(async () => {
-            const recipes = await RecipesDataService.getAll();
+            const recipes = await recipesService.getAll();
             setRecipes(recipes);
-    }, []);
+    }, [recipesService]);
 
     const refreshList = useCallback(() => {
         retrieveRecipes();
     }, [retrieveRecipes]);
 
     const disableRecipe = useCallback(async (recipe: Recipe) => {
-        await RecipesDataService.disable(recipe.id);
+        await recipesService.disable(recipe.id);
         refreshList();    
-    }, [refreshList]);
+    }, [refreshList, recipesService]);
 
     const removeAllRecipes = useCallback(async () => {
-        await RecipesDataService.deleteAll();
+        await recipesService.deleteAll();
         refreshList();
-    }, [refreshList]);
+    }, [refreshList, recipesService]);
 
     useEffect(() => {
         retrieveRecipes();

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import RecipesDataService from '../../services/recipes.service';
+import { useRecipesService } from '../../services/recipes.service';
 import { Recipe } from '../../models/recipe';
 
 const EditRecipe: React.FC = () => {
@@ -12,6 +12,8 @@ const EditRecipe: React.FC = () => {
     disabled: false
   };
 
+  const recipesService = useRecipesService();
+
   const [currentRecipe, setCurrentRecipe] = useState<Recipe>(initialRecipeState);
   const [message, setMessage] = useState<string>('');
   const { id } = useParams<{ id: string }>();
@@ -19,7 +21,7 @@ const EditRecipe: React.FC = () => {
 
   const getRecipe = async (id: number) => {
     try {
-      const response = await RecipesDataService.get(id);
+      const response = await recipesService.get(id);
       setCurrentRecipe(response);
     } catch (error) {
       console.error('Error retrieving recipe:', error);
@@ -47,7 +49,7 @@ const EditRecipe: React.FC = () => {
     e.preventDefault();
     
     try {
-      await RecipesDataService.update(currentRecipe.id, currentRecipe);
+      await recipesService.update(currentRecipe.id, currentRecipe);
       setMessage('The recipe was updated successfully!');
     } catch (error) {
       console.error('Error updating recipe:', error);
@@ -57,7 +59,7 @@ const EditRecipe: React.FC = () => {
 
   const deleteRecipe = async () => {
     try {
-      await RecipesDataService.delete(currentRecipe.id);
+      await recipesService.delete(currentRecipe.id);
       navigate('/recipes');
     } catch (error) {
       console.error('Error deleting recipe:', error);

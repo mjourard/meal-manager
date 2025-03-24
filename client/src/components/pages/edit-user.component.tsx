@@ -1,6 +1,6 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import SysUsersDataService from '../../services/sys-users.service';
+import { useSysUsersService } from '../../services/sys-users.service';
 import { SysUser } from '../../models/sys-user';
 
 const EditUser: React.FC = () => {
@@ -21,25 +21,30 @@ const EditUser: React.FC = () => {
   const navigate = useNavigate();
   const isNewUser = id === 'new';
 
+  const sysUsersService = useSysUsersService();
+
+  const getUser = useCallback(async (id: number) => {
+    try {
+        const userData = await sysUsersService.get(id);
+        setCurrentUser(userData);
+        setLoading(false);
+    } catch (error) {
+        console.error('Error retrieving user:', error);
+        setError('Error retrieving user');
+        setLoading(false);
+    }
+  }, [sysUsersService]);
+
   useEffect(() => {
     if (!isNewUser && id) {
       getUser(parseInt(id, 10));
     } else {
       setLoading(false);
     }
-  }, [id, isNewUser]);
+  }, [id, isNewUser, getUser]);
 
-  const getUser = async (id: number) => {
-    try {
-      const userData = await SysUsersDataService.get(id);
-      setCurrentUser(userData);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error retrieving user:', error);
-      setError('Error retrieving user');
-      setLoading(false);
-    }
-  };
+  
+    
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -56,12 +61,12 @@ const EditUser: React.FC = () => {
     
     try {
       if (isNewUser) {
-        await SysUsersDataService.create(currentUser);
+        await sysUsersService.create(currentUser);
         setMessage('User was created successfully!');
         // Optionally navigate back to users list after creation
         // navigate('/users');
       } else {
-        await SysUsersDataService.update(currentUser.id, currentUser);
+        await sysUsersService.update(currentUser.id, currentUser);
         setMessage('The user was updated successfully!');
       }
     } catch (error) {
@@ -72,7 +77,7 @@ const EditUser: React.FC = () => {
 
   const deleteUser = async () => {
     try {
-      await SysUsersDataService.delete(currentUser.id);
+      await sysUsersService.delete(currentUser.id);
       navigate('/users');
     } catch (error) {
       console.error('Error deleting user:', error);

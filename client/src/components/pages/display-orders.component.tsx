@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import RecipeOrdersDataService from '../../services/recipe-orders.service';
+import { useRecipeOrdersService } from '../../services/recipe-orders.service';
 import { RecipeOrder } from '../../models/recipe-order';
 import { DisplayRecipeOrderDetails } from '../../models/recipe-order-details';
 
 const DisplayOrders: React.FC = () => {
+  // Use the hook for recipe orders service
+  const recipeOrdersService = useRecipeOrdersService();
+  
   const [orders, setOrders] = useState<RecipeOrder[]>([]);
   const [currentOrder, setCurrentOrder] = useState<RecipeOrder | null>(null);
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
@@ -19,7 +22,7 @@ const DisplayOrders: React.FC = () => {
   const retrieveOrders = async () => {
     try {
       setLoading(true);
-      const data = await RecipeOrdersDataService.getAll();
+      const data = await recipeOrdersService.getAll();
       setOrders(data);
       setLoading(false);
     } catch (error) {
@@ -35,7 +38,7 @@ const DisplayOrders: React.FC = () => {
       setCurrentIndex(index);
       
       // Fetch order details using the correct endpoint and interface
-      const orderDetails = await RecipeOrdersDataService.get(order.id);
+      const orderDetails = await recipeOrdersService.get(order.id);
       setCurrentOrderDetails(orderDetails);
     } catch (error) {
       console.error('Error retrieving order details:', error);

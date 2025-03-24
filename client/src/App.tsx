@@ -1,10 +1,19 @@
 import './App.css'
-
+import { 
+    SignIn, 
+    SignUp, 
+    UserProfile, 
+    UserButton, 
+    SignedIn, 
+    SignedOut,
+    RedirectToSignIn 
+  } from '@clerk/clerk-react';
 import {
     Link,Routes,Route,
     BrowserRouter as Router
 } from "react-router-dom";
 
+import Home from "./components/pages/home.component";
 import AddRecipe from "./components/pages/add-recipe.component";
 import EditRecipe from "./components/pages/edit-recipe.component";
 import DisplayRecipes from "./components/pages/display-recipes.component";
@@ -48,22 +57,48 @@ function App() {
               </Link>
             </li>
           </div>
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
+          <SignedOut>
+            <div className="navbar-nav mr-auto">
+              <a href="/sign-in" className="btn btn-outline-light">Sign In</a>
+              <a href="/sign-up" className="btn btn-outline-light">Sign Up</a>
+            </div>
+          </SignedOut>
         </nav>
         <div className="container mt-3" id="main-content">
           <Routes> 
-            <Route path="/" element={<DisplayRecipes />} />
-            <Route path="/recipes" element={<DisplayRecipes />} />
-            <Route path="/add" element={<AddRecipe />} />
-            <Route path="/recipes/:id" element={<EditRecipe />} />
-            <Route path="/choose-recipes" element={<RecipeSelector />} />
-            <Route path="/orders" element={<DisplayOrders />} />
-            <Route path="/orders/:id" element={<EditOrder />} />
-            <Route path="/users" element={<DisplayUsers />} />
-            <Route path="/myusers/:id" element={<EditUser />} />
+            {/* Public routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/sign-in/*" element={<SignIn routing="path" path="/sign-in" />} />
+            <Route path="/sign-up/*" element={<SignUp routing="path" path="/sign-up" />} />
+            
+            {/* Protected routes */} 
+            <Route path="/recipes" element={<RequireAuth><DisplayRecipes /></RequireAuth>} />
+            <Route path="/add" element={<RequireAuth><AddRecipe /></RequireAuth>} />
+            <Route path="/recipes/:id" element={<RequireAuth><EditRecipe /></RequireAuth>} />
+            <Route path="/choose-recipes" element={<RequireAuth><RecipeSelector /></RequireAuth>} />
+            <Route path="/orders" element={<RequireAuth><DisplayOrders /></RequireAuth>} />
+            <Route path="/orders/:id" element={<RequireAuth><EditOrder /></RequireAuth>} />
+            <Route path="/users" element={<RequireAuth><DisplayUsers /></RequireAuth>} />
+            <Route path="/myusers/:id" element={<RequireAuth><EditUser /></RequireAuth>} />
           </Routes>
         </div>
       </Router>
   );
 }
+
+// RequireAuth component to protect routes
+function RequireAuth({ children }) {
+    return (
+      <>
+        <SignedIn>{children}</SignedIn>
+        <SignedOut>
+          <RedirectToSignIn />
+        </SignedOut>
+      </>
+    );
+  }
 
 export default App
