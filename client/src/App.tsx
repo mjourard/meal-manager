@@ -26,9 +26,11 @@ function App() {
   return (
       <Router>
         <nav className="navbar fixed-top navbar-expand navbar-dark bg-dark">
-          <a href={"/"} className="navbar-brand">
-            Meal Manager
-          </a>
+          <li className="navbar-brand">
+            <Link to={"/"}  className="nav-link">
+              Meal Manager
+            </Link>
+          </li>
           <div className="navbar-nav mr-auto">
             <li className="nav-item">
               <Link to="/recipes" className="nav-link">

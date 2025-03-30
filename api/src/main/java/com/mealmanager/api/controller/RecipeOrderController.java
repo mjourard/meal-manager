@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -94,6 +95,14 @@ public class RecipeOrderController {
             if (orders.isEmpty()) {
                 return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
             }
+            
+            // Ensure all orders have createdAt and fulfilled values set
+            for (RecipeOrder order : orders) {
+                if (order.getCreatedAt() == null) {
+                    order.setCreatedAt(new Date());
+                }
+            }
+            
             return new ResponseEntity<>(orders, HttpStatus.OK);
         } catch (Exception e) {
             logger.error("Error while retrieving orders", e);

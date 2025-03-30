@@ -1,4 +1,5 @@
 import { SignedIn, SignedOut, useUser } from '@clerk/clerk-react';
+import { Link } from 'react-router-dom';
 
 function Home() {
   const { user } = useUser();
@@ -17,7 +18,7 @@ function Home() {
               <div className="card-body">
                 <h5 className="card-title">Recipes</h5>
                 <p className="card-text">Manage your collection of recipes.</p>
-                <a href="/recipes" className="btn btn-primary">Go to Recipes</a>
+                <Link to="/recipes" className="btn btn-primary">Go to Recipes</Link>
               </div>
             </div>
           </div>
@@ -26,7 +27,7 @@ function Home() {
               <div className="card-body">
                 <h5 className="card-title">Orders</h5>
                 <p className="card-text">Create and manage meal orders.</p>
-                <a href="/orders" className="btn btn-primary">Go to Orders</a>
+                <Link to="/orders" className="btn btn-primary">Go to Orders</Link>
               </div>
             </div>
           </div>
@@ -35,7 +36,7 @@ function Home() {
               <div className="card-body">
                 <h5 className="card-title">Users</h5>
                 <p className="card-text">Manage system users.</p>
-                <a href="/users" className="btn btn-primary">Go to Users</a>
+                <Link to="/users" className="btn btn-primary">Go to Users</Link>
               </div>
             </div>
           </div>
