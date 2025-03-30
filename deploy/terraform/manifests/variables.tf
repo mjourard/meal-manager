@@ -42,8 +42,53 @@ variable "repository_branch" {
   default     = "main"
 }
 
-variable "railway_app_domain" {
-  description = "The domain of your Railway app (e.g., your-app.up.railway.app)"
+# Fly.io specific variables
+variable "fly_api_token" {
+  description = "API token for Fly.io"
   type        = string
-  # This should be set in your terraform.tfvars file after manually deploying to Railway
+  sensitive   = true
+  # This should be set in your terraform.tfvars file or as an environment variable
+}
+
+variable "fly_org" {
+  description = "The organization name on Fly.io"
+  type        = string
+  default     = "personal"
+}
+
+variable "fly_region" {
+  description = "The primary region to deploy Fly.io applications"
+  type        = string
+  default     = "yul" # Montreal, Ontario, Canada
+}
+
+variable "fly_app_name" {
+  description = "The name of the main application on Fly.io"
+  type        = string
+  default     = "meal-manager"
+}
+
+variable "fly_db_name" {
+  description = "The name of the PostgreSQL database on Fly.io"
+  type        = string
+  default     = "meal-manager-db"
+}
+
+variable "fly_rabbitmq_name" {
+  description = "The name of the RabbitMQ instance on Fly.io"
+  type        = string
+  default     = "meal-manager-mq"
+}
+
+variable "fly_api_image" {
+  description = "The Docker image for the API (e.g., username/repo:tag)"
+  type        = string
+  default     = "meal-manager-api:latest"
+}
+
+variable "postgres_password" {
+  description = "Password for the PostgreSQL database"
+  type        = string
+  sensitive   = true
+  # This should be set in your terraform.tfvars file
 } 

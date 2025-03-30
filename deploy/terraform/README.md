@@ -7,8 +7,9 @@ This directory contains Terraform configurations to deploy the Meal Manager appl
 The infrastructure is deployed across multiple cloud providers to optimize for cost and simplicity:
 
 - **Frontend**: Static site hosting on Render (free tier)
-- **Backend**: Java Spring Boot API on Railway (free tier with usage limits)
-- **Database**: PostgreSQL on Railway (free tier with usage limits)
+- **Backend**: Spring Boot API deployed to Fly.io (free tier with generous limits)
+- **Database**: PostgreSQL on Fly.io (shared CPU instances with volumes)
+- **Message Broker**: RabbitMQ on Fly.io
 - **DNS**: AWS Route53 for domain management
 
 For a visual representation of the architecture, see [the architecture diagram](manifests/architecture.md).
@@ -19,9 +20,10 @@ Before you begin, you'll need:
 
 1. An AWS account with access to Route53
 2. A Render account and API key
-3. A Railway account
+3. A Fly.io account
 4. Terraform CLI installed locally (v1.0.0+)
 5. AWS CLI configured with appropriate credentials
+6. Docker installed locally for building and deploying images
 
 ## Initial Setup
 
@@ -35,21 +37,30 @@ cd deploy/terraform/scripts
 ./bootstrap-terraform-backend.sh
 ```
 
-### 2. Deploy Railway Resources Manually
+### 2. Deploy Backend Resources to Fly.io
 
-Since Railway doesn't have a Terraform provider, you'll need to deploy these resources manually:
+For Fly.io deployments, we provide scripts to automate the process:
 
-1. Create a new Railway project
-2. Add a PostgreSQL database
-3. Configure a new service for the Spring Boot API
-   - Connect your GitHub repository
-   - Set required environment variables:
-     - `SPRING_PROFILES_ACTIVE=prod`
-     - `SPRING_DATASOURCE_URL` (should be auto-configured by Railway)
-     - `SPRING_DATASOURCE_USERNAME` (should be auto-configured by Railway)
-     - `SPRING_DATASOURCE_PASSWORD` (should be auto-configured by Railway)
-4. Deploy the service
-5. Note the generated domain (e.g., `meal-manager-api.up.railway.app`)
+1. Install the Fly.io CLI:
+   ```bash
+   curl -L https://fly.io/install.sh | sh
+   ```
+
+2. Log in to your Fly.io account:
+   ```bash
+   fly auth login
+   ```
+
+3. Deploy all backend resources using the provided script:
+   ```bash
+   cd deploy/scripts
+   POSTGRES_PASSWORD=your_secure_password ./deploy-all-to-fly.sh
+   ```
+
+   This script will:
+   - Create a PostgreSQL instance with persistent storage
+   - Create a RabbitMQ instance with persistent storage
+   - Build and deploy your Spring Boot API using the Dockerfile.fly in the api directory
 
 ### 3. Configure Terraform Variables
 
@@ -61,6 +72,16 @@ cp terraform.tfvars.example terraform.tfvars
 # Edit the file with your specific values
 vim terraform.tfvars
 ```
+
+### 4. Render Custom Domain Configuration
+
+The Terraform configuration automatically sets up:
+- A custom domain in Render via the `custom_domains` attribute
+- A CNAME record in Route53 pointing to the Render default domain
+
+Note that you'll need to verify domain ownership according to Render's requirements, which typically involves:
+1. Adding a verification TXT record to your DNS (Render will provide the details)
+2. Confirming ownership through the Render dashboard
 
 ## Deployment
 
@@ -83,7 +104,7 @@ After successful deployment:
 
 1. Verify the frontend is accessible at `https://app.yourdomain.com`
 2. Verify the API is accessible at `https://api.yourdomain.com`
-3. Configure custom domains in Railway to match your Route53 records
+3. Configure custom domains in Fly.io to match your Route53 records
 
 ## Maintenance
 
@@ -92,18 +113,20 @@ After successful deployment:
 When you make changes to the application:
 
 ```bash
-# Update just the Terraform-managed resources
+# For frontend updates (Render):
 cd deploy/terraform/manifests
 terraform apply
 
-# Railway resources will auto-deploy on git push if configured for CI/CD
+# For Fly.io backend updates:
+cd deploy/scripts
+./deploy-to-fly.sh
 ```
 
 ### Monitoring Costs
 
 Monitor your usage to avoid exceeding free tiers:
 
-1. Railway dashboard for API and database usage
+1. Fly.io dashboard for API, PostgreSQL, and RabbitMQ usage
 2. Render dashboard for frontend usage
 3. AWS Billing dashboard for Route53 charges
 
@@ -116,7 +139,10 @@ To destroy all resources when they're no longer needed:
 cd deploy/terraform/manifests
 terraform destroy
 
-# Manually delete Railway resources through their UI
+# Remove Fly.io resources:
+fly apps destroy meal-manager
+fly apps destroy meal-manager-db
+fly apps destroy meal-manager-mq
 ```
 
 ## Troubleshooting
@@ -124,7 +150,8 @@ terraform destroy
 Common issues and solutions:
 
 1. **DNS not resolving**: Check that your Route53 records are correctly pointing to your service domains
-2. **Railway deployment failures**: Check logs in the Railway dashboard
+2. **Fly.io deployment failures**: Check logs with `fly logs`
 3. **Terraform state issues**: Ensure your S3 bucket and DynamoDB table are correctly configured
+4. **Render custom domain issues**: Check the verification status in the Render dashboard and make sure DNS propagation has completed
 
 For more detailed debugging information, see the [DEBUGGING.md](../../DEBUGGING.md) file in the repository root. 
