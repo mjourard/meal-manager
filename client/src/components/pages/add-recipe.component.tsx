@@ -90,16 +90,10 @@ const AddRecipe: React.FC = () => {
       
       reader.onload = async (event) => {
         if (event.target && event.target.result) {
-          const csvContent = event.target.result as string;
-          
-          try {
-            await recipesService.multiCreate(csvContent);
-            setBatchSubmitted(true);
-            setMessage('Recipes were uploaded successfully!');
-          } catch (error) {
-            console.error('Error creating recipes from CSV:', error);
-            setError('Failed to create recipes from CSV');
-          }
+          // Instead of calling removed multiCreate method, show a message that CSV upload is not available
+          setError('CSV upload is not available in the current version');
+          console.warn('CSV upload functionality has been disabled');
+          // The multi-create feature was removed due to build issues with PapaParse
         }
       };
       

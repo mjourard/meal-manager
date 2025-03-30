@@ -10,13 +10,24 @@ export const useRecipeOrderRecipientsDataService = () => {
                 return response.data;
             } catch (error) {
                 if (error instanceof Error) {
-                    throw new Error(`Failed to fetch RecipeOrderRecipient with id ${id}: ${error.message}`, { cause: error });
+                    throw new Error(`Failed to fetch recipe order recipient with id ${id}: ${error.message}`, { cause: error });
                 } else {
-                    throw new Error(`Failed to fetch RecipeOrderRecipient with id ${id}: ${JSON.stringify(error)}`);
+                    throw new Error(`Failed to fetch recipe order recipient with id ${id}: ${JSON.stringify(error)}`);
                 }
             }
         },
-
+        async create(data: RecipeOrderRecipient): Promise<RecipeOrderRecipient> {
+            try {
+                const response = await http.post('/recipe-order-recipients', data);
+                return response.data;
+            } catch (error) {
+                if (error instanceof Error) {
+                    throw new Error(`Failed to create recipe order recipient: ${error.message}`, { cause: error });
+                } else {
+                    throw new Error(`Failed to create recipe order recipient: ${JSON.stringify(error)}`);
+                }
+            }
+        },
         async update(id: number, data: RecipeOrderRecipient): Promise<RecipeOrderRecipient> {
             try {
                 const response = await http.put(`/recipe-order-recipients/${id}`, data);
@@ -30,6 +41,4 @@ export const useRecipeOrderRecipientsDataService = () => {
             }
         }
     }
-}
-
-export default new RecipeOrderRecipientsDataService(); 
+} 

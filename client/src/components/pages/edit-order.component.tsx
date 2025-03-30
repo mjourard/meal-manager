@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useRecipeOrdersService } from '../../services/recipe-orders.service';
 import { useRecipesService } from '../../services/recipes.service';
 import { useSysUsersService } from '../../services/sys-users.service';
-import { useRecipeOrderItemsDataService } from '../../services/recipe-order-items.service';
 import { RecipeOrderDetails } from '../../models/recipe-order-details';
 import { DisplayRecipe } from '../../models/recipe';
 import { DisplaySysUser } from '../../models/sys-user';
@@ -20,7 +19,6 @@ const EditOrder: React.FC = () => {
   const recipeOrdersService = useRecipeOrdersService();
   const recipesService = useRecipesService();
   const sysUsersService = useSysUsersService();
-  const recipeOrderItemsService = useRecipeOrderItemsDataService();
 
   const [currentOrder, setCurrentOrder] = useState<RecipeOrderDetails>(initialOrderState);
   const [availableRecipes, setAvailableRecipes] = useState<DisplayRecipe[]>([]);

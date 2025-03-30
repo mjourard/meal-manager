@@ -24,14 +24,14 @@ const DisplayRecipes: React.FC = () => {
         retrieveRecipes();
     }, [retrieveRecipes]);
 
-    const disableRecipe = useCallback(async (recipe: Recipe, index: number) => {
+    const disableRecipe = useCallback(async (recipe: Recipe) => {
         try {
-            await recipesService.disable(recipe.id);
-            refreshList();
+            await recipesService.update(recipe.id, { ...recipe, disabled: !recipe.disabled });
+            await retrieveRecipes();
         } catch (error) {
-            console.error(`Error disabling recipe ${recipe.id}:`, error);
+            console.error('Error toggling recipe disabled state:', error);
         }
-    }, [refreshList, recipesService]);
+    }, [recipesService, retrieveRecipes]);
 
     const removeAllRecipes = useCallback(async () => {
         try {
