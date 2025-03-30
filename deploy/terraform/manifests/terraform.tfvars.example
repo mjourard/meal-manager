@@ -1,0 +1,21 @@
+# Sample terraform.tfvars file
+# Copy this file to terraform.tfvars and fill in your values
+
+# AWS Configuration
+aws_region = "us-east-1"
+environment = "prod"
+
+# Domain Configuration
+domain_name = "example.com"  # Replace with your actual domain
+
+# Render Configuration
+render_api_key = "rnd_XXXXXXXXXXXXXXXXXXXXXXXXXXXX"  # Replace with your Render API key
+render_team_name = "your-team"  # Replace with your Render team name
+
+# Railway Configuration
+# This value must be obtained after manually deploying your app to Railway
+railway_app_domain = "meal-manager-api.up.railway.app"  # Replace with your Railway app domain
+
+# Git Repository - Update if you've forked the repository
+repository_url = "https://github.com/mjourard/meal-manager"
+repository_branch = "main"  # Change if deploying from a different branch 
