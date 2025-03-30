@@ -17,11 +17,6 @@ const RecipesList: React.FC<{ recipes: Recipe[], removeRecipe: (recipe: Recipe, 
         removeRecipe(recipe, index);
     };
 
-    console.log({
-        msg: 'recipes = ',
-        recipes
-    })
-
     return (
         <div className="list row">
             <div className="col-md-6">

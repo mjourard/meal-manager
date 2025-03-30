@@ -11,7 +11,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@clerk/clerk-react": "^5.24.1",
+    "@clerk/clerk-react": "^5.25.2",
     "axios": "^1.8.2",
     "bootstrap": "^5.3.3",
     "jquery": "^3.7.1",

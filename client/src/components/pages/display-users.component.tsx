@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import SysUsersDataService from '../../services/sys-users.service';
+import { useSysUsersService } from '../../services/sys-users.service';
 import { SysUser } from '../../models/sys-user';
 
 const DisplayUsers: React.FC = () => {
@@ -10,6 +10,8 @@ const DisplayUsers: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  const sysUsersService = useSysUsersService();
+
   useEffect(() => {
     retrieveUsers();
   }, []);
@@ -17,7 +19,7 @@ const DisplayUsers: React.FC = () => {
   const retrieveUsers = async () => {
     try {
       setLoading(true);
-      const data = await SysUsersDataService.getAll();
+      const data = await sysUsersService.getAll();
       setUsers(data);
       setLoading(false);
     } catch (error) {
@@ -40,7 +42,7 @@ const DisplayUsers: React.FC = () => {
 
   const toggleUserDefaultChecked = async (id: number, defaultChecked: boolean) => {
     try {
-      await SysUsersDataService.updateDefaultChecked(id, !defaultChecked);
+      await sysUsersService.updateDefaultChecked(id, !defaultChecked);
       refreshList();
     } catch (error) {
       console.error('Error updating user default checked status:', error);

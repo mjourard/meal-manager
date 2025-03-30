@@ -1,83 +1,116 @@
-import { SysUser } from "../models/sys-user";
-import http from "./client";
+import { useCallback } from 'react';
+import { CreateSysUser, UpdateSysUser, DisplaySysUser } from "../models/sys-user";
+import { useAuthClient } from './client';
+import { logger } from './logging.service'; // Import the global logger
 
-class SysUsersDataService {
-    async getAll(): Promise<SysUser[]> {
-        try {
-            const response = await http.get("/users");
-            return response.data;
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(`Failed to fetch SysUsers: ${error.message}`, { cause: error });
-            } else {
-                throw new Error(`Failed to fetch SysUsers: ${JSON.stringify(error)}`);
-            }
-        }
+export const useSysUsersService = () => {
+  const authClient = useAuthClient();
+
+  const getAll = useCallback(async (): Promise<DisplaySysUser[]> => {
+    try {
+      const response = await authClient.get('/users');
+      if (response.status === 204) {
+        return [];
+      }
+      return response.data;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch SysUsers: ${error.message}`, { cause: error });
+      } else {
+        throw new Error(`Failed to fetch SysUsers: ${JSON.stringify(error)}`);
+      }
     }
+  }, [authClient]);
 
-    async get(id: number): Promise<SysUser> {
-        try {
-            const response = await http.get(`/users/${id}`);
-            return response.data;
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(`Failed to fetch SysUser with id ${id}: ${error.message}`, { cause: error });
-            } else {
-                throw new Error(`Failed to fetch SysUser with id ${id}: ${JSON.stringify(error)}`);
-            }
-        }
+  const getDefaultChecked = useCallback(async (): Promise<DisplaySysUser[]> => {
+    try {
+      // Since there's no specific endpoint for defaultChecked users,
+      // fetch all users and filter the ones with defaultChecked=true
+      logger.debug('Fetching all users to filter defaultChecked', 'SysUsersService');
+      const allUsers = await getAll();
+      const defaultCheckedUsers = allUsers.filter(user => user.defaultChecked === true);
+      logger.debug(`Found ${defaultCheckedUsers.length} defaultChecked users out of ${allUsers.length} total users`, 'SysUsersService');
+      return defaultCheckedUsers;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch default checked SysUsers: ${error.message}`, { cause: error });
+      } else {
+        throw new Error(`Failed to fetch default checked SysUsers: ${JSON.stringify(error)}`);
+      }
     }
+  }, [authClient, getAll]);
 
-    async create(data: SysUser): Promise<SysUser> {
-        try {
-            const response = await http.post("/users", data);
-            return response.data;
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(`Failed to create SysUser: ${error.message}`, { cause: error });
-            } else {
-                throw new Error(`Failed to create SysUser: ${JSON.stringify(error)}`);
-            }
-        }
+  const get = useCallback(async (id: number): Promise<DisplaySysUser> => {
+    try {
+      const response = await authClient.get(`/users/${id}`);
+      return response.data;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch SysUser with id ${id}: ${error.message}`, { cause: error });
+      } else {
+        throw new Error(`Failed to fetch SysUser with id ${id}: ${JSON.stringify(error)}`);
+      }
     }
+  }, [authClient]);
 
-    async update(id: number, data: SysUser): Promise<SysUser> {
-        try {
-            const response = await http.put(`/users/${id}`, data);
-            return response.data;
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(`Failed to update SysUser with id ${id}: ${error.message}`, { cause: error });
-            } else {
-                throw new Error(`Failed to update SysUser with id ${id}: ${JSON.stringify(error)}`);
-            }
-        }
+  const create = useCallback(async (data: CreateSysUser): Promise<DisplaySysUser> => {
+    try {
+      const response = await authClient.post('/users', data);
+      return response.data;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to create SysUser: ${error.message}`, { cause: error });
+      } else {
+        throw new Error(`Failed to create SysUser: ${JSON.stringify(error)}`);
+      }
     }
+  }, [authClient]);
 
-    async delete(id: number): Promise<void> {
-        try {
-            await http.delete(`/users/${id}`);
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(`Failed to delete SysUser with id ${id}: ${error.message}`, { cause: error });
-            } else {
-                throw new Error(`Failed to delete SysUser with id ${id}: ${JSON.stringify(error)}`);
-            }
-        }
+  const update = useCallback(async (id: number, data: UpdateSysUser): Promise<DisplaySysUser> => {
+    try {
+      const response = await authClient.put(`/users/${id}`, data);
+      return response.data;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to update SysUser with id ${id}: ${error.message}`, { cause: error });
+      } else {
+        throw new Error(`Failed to update SysUser with id ${id}: ${JSON.stringify(error)}`);
+      }
     }
+  }, [authClient]);
 
-    async updateDefaultChecked(id: number, defaultChecked: boolean): Promise<SysUser> {
-        try {
-            const response = await http.put(`/users/${id}/defaultchecked`, { defaultChecked });
-            return response.data;
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(`Failed to update default checked status for SysUser with id ${id}: ${error.message}`, { cause: error });
-            } else {
-                throw new Error(`Failed to update default checked status for SysUser with id ${id}: ${JSON.stringify(error)}`);
-            }
-        }
+  const updateDefaultChecked = useCallback(async (id: number, defaultChecked: boolean): Promise<DisplaySysUser> => {
+    try {
+      const response = await authClient.put(`/users/${id}/defaultchecked`, { defaultChecked });
+      return response.data;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to update default checked status for SysUser with id ${id}: ${error.message}`, { cause: error });
+      } else {
+        throw new Error(`Failed to update default checked status for SysUser with id ${id}: ${JSON.stringify(error)}`);
+      }
     }
-}
+  }, [authClient]);
 
-export default new SysUsersDataService(); 
+  const deleteUser = useCallback(async (id: number): Promise<void> => {
+    try {
+      await authClient.delete(`/users/${id}`);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to delete SysUser with id ${id}: ${error.message}`, { cause: error });
+      } else {
+        throw new Error(`Failed to delete SysUser with id ${id}: ${JSON.stringify(error)}`);
+      }
+    }
+  }, [authClient]);
+
+  return {
+    getAll,
+    getDefaultChecked,
+    get,
+    create,
+    update,
+    updateDefaultChecked,
+    delete: deleteUser
+  };
+}; 

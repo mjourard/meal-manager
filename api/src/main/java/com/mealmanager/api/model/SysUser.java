@@ -21,6 +21,9 @@ public class SysUser {
 
     @Column(name = "defaultchecked", nullable = false, columnDefinition = "boolean default true")
     private Boolean defaultChecked;
+    
+    @Column(name = "clerk_user_id", unique = true)
+    private String clerkUserId;
 
     public SysUser() {}
 
@@ -29,6 +32,14 @@ public class SysUser {
         this.lastName = lastname;
         this.email = email;
         this.defaultChecked = defaultChecked;
+    }
+    
+    public SysUser(String firstname, String lastname, String email, Boolean defaultChecked, String clerkUserId) {
+        this.firstName = firstname;
+        this.lastName = lastname;
+        this.email = email;
+        this.defaultChecked = defaultChecked;
+        this.clerkUserId = clerkUserId;
     }
 
     public long getId() {
@@ -65,5 +76,13 @@ public class SysUser {
 
     public Boolean getDefaultChecked() {
         return this.defaultChecked;
+    }
+    
+    public void setClerkUserId(String clerkUserId) {
+        this.clerkUserId = clerkUserId;
+    }
+    
+    public String getClerkUserId() {
+        return this.clerkUserId;
     }
 }

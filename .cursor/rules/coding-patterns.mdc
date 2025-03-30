@@ -18,4 +18,5 @@ alwaysApply: false
 - Mocking data is only needed for tests, never mock data for dev or prod
 - Never add stubbing or fake data patterns to code that affects the dev or prod environments
 - Never overwrite my .env file without first asking and confirming
+- adhere to code linting rules when you can. If you are going to override a linter rule, ensure you add a comment explaining why you need to override it.
 

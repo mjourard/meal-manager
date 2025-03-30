@@ -1,126 +1,107 @@
+import { useCallback } from 'react';
 import { CreateRecipe, UpdateRecipe, DisplayRecipe } from "../models/recipe";
-import http from "./client";
-import Papa from 'papaparse';
+import { useAuthClient } from "./client";
 
-class RecipesDataService {
-    async getAll(): Promise<DisplayRecipe[]> {
-        try {
-            const response = await http.get("/recipes");
-            // Check for 204 No Content
-            if (response.status === 204) {
-                return [];
-            }
-            return response.data;
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(`Failed to fetch Recipes: ${error.message}`, { cause: error });
-            } else {
-                throw new Error(`Failed to fetch Recipes: ${JSON.stringify(error)}`);
-            }
-        }
+// Hook for authenticated methods
+export const useRecipesService = () => {
+  const authClient = useAuthClient();
+  
+  const getAll = useCallback(async (): Promise<DisplayRecipe[]> => {
+    try {
+      const response = await authClient.get('/recipes');
+      return response.data;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch Recipes: ${error.message}`, { cause: error });
+      } else {
+        throw new Error(`Failed to fetch Recipes: ${JSON.stringify(error)}`);
+      }
     }
+  }, [authClient]);
 
-    async get(id: number): Promise<DisplayRecipe> {
-        try {
-            const response = await http.get(`/recipes/${id}`);
-            return response.data;
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(`Failed to fetch Recipe with id ${id}: ${error.message}`, { cause: error });
-            } else {
-                throw new Error(`Failed to fetch Recipe with id ${id}: ${JSON.stringify(error)}`);
-            }
-        }
+  const get = useCallback(async (id: number): Promise<DisplayRecipe> => {
+    try {
+      const response = await authClient.get(`/recipes/${id}`);
+      return response.data;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to fetch Recipe with id ${id}: ${error.message}`, { cause: error });
+      } else {
+        throw new Error(`Failed to fetch Recipe with id ${id}: ${JSON.stringify(error)}`);
+      }
     }
+  }, [authClient]);
 
-    async create(data: CreateRecipe): Promise<DisplayRecipe> {
-        try {
-            const response = await http.post("/recipes", data);
-            return response.data;
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(`Failed to create Recipe: ${error.message}`, { cause: error });
-            } else {
-                throw new Error(`Failed to create Recipe: ${JSON.stringify(error)}`);
-            }
-        }
+  const create = useCallback(async (data: CreateRecipe): Promise<DisplayRecipe> => {
+    try {
+      const response = await authClient.post('/recipes', data);
+      return response.data;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to create Recipe: ${error.message}`, { cause: error });
+      } else {
+        throw new Error(`Failed to create Recipe: ${JSON.stringify(error)}`);
+      }
     }
+  }, [authClient]);
 
-    async update(id: number, data: UpdateRecipe): Promise<DisplayRecipe> {
-        try {
-            const response = await http.put(`/recipes/${id}`, data);
-            return response.data;
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(`Failed to update Recipe with id ${id}: ${error.message}`, { cause: error });
-            } else {
-                throw new Error(`Failed to update Recipe with id ${id}: ${JSON.stringify(error)}`);
-            }
-        }
+  const update = useCallback(async (id: number, data: UpdateRecipe): Promise<DisplayRecipe> => {
+    try {
+      const response = await authClient.put(`/recipes/${id}`, data);
+      return response.data;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to update Recipe with id ${id}: ${error.message}`, { cause: error });
+      } else {
+        throw new Error(`Failed to update Recipe with id ${id}: ${JSON.stringify(error)}`);
+      }
     }
+  }, [authClient]);
 
-    async multiCreate(data: string): Promise<DisplayRecipe[]> {
-        try {
-            const results: any = await new Promise((resolve, reject) => {
-                Papa.parse(data, {
-                    complete: resolve,
-                    error: reject
-                });
-            });
-
-            const recipes: CreateRecipe[] = results.data.map((rawRecipe: any) => ({
-                name: rawRecipe[0],
-                description: rawRecipe.length >= 2 ? rawRecipe[1] : null,
-                recipeURL: rawRecipe.length >= 3 ? rawRecipe[2] : null,
-                disabled: rawRecipe.length >= 4 ? rawRecipe[3] : false
-            }));
-
-            const response = await http.post("/recipes/multiadd", recipes);
-            return response.data;
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(`Failed to create multiple Recipes: ${error.message}`, { cause: error });
-            } else {
-                throw new Error(`Failed to create multiple Recipes: ${JSON.stringify(error)}`);
-            }
-        }
+  const disable = useCallback(async (id: number): Promise<DisplayRecipe> => {
+    try {
+      const response = await authClient.delete(`/recipes/${id}`);
+      return response.data;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to disable Recipe with id ${id}: ${error.message}`, { cause: error });
+      } else {
+        throw new Error(`Failed to disable Recipe with id ${id}: ${JSON.stringify(error)}`);
+      }
     }
+  }, [authClient]);
 
-    async disable(id: number): Promise<void> {
-        try {
-            await http.put(`/recipes/${id}/disable`);
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(`Failed to disable Recipe with id ${id}`, { cause: error });
-            } else {
-                throw new Error(`Failed to disable Recipe with id ${id} ${JSON.stringify(error)}`);
-            }
-        }
+  const deleteRecipe = useCallback(async (id: number): Promise<void> => {
+    try {
+      await authClient.delete(`/recipes/${id}/delete`);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to delete Recipe with id ${id}: ${error.message}`, { cause: error });
+      } else {
+        throw new Error(`Failed to delete Recipe with id ${id}: ${JSON.stringify(error)}`);
+      }
     }
+  }, [authClient]);
 
-    async delete(id: number): Promise<void> {
-        try {
-            await http.delete(`/recipes/${id}`);
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(`Failed to delete Recipe with id ${id}: ${error.message}`, { cause: error });
-            } else {
-                throw new Error(`Failed to delete Recipe with id ${id}: ${JSON.stringify(error)}`);
-            }
-        }
+  const deleteAll = useCallback(async (): Promise<void> => {
+    try {
+      await authClient.delete(`/recipes`);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to delete all Recipes: ${error.message}`, { cause: error });
+      } else {
+        throw new Error(`Failed to delete all Recipes: ${JSON.stringify(error)}`);
+      }
     }
+  }, [authClient]);
 
-    async deleteAll(): Promise<void> {
-        try {
-            await http.delete("/recipes");
-        } catch (error) {
-            if (error instanceof Error) {
-                throw new Error(`Failed to delete all Recipes`, { cause: error });
-            } else {
-                throw new Error(`Failed to delete all Recipes: ${JSON.stringify(error)}`);
-            }
-        }
-    }
-}
-
-export default new RecipesDataService();
+  return {
+    getAll,
+    get,
+    create,
+    update,
+    disable,
+    delete: deleteRecipe,
+    deleteAll
+  };
+};

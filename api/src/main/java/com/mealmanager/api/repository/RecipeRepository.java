@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     List<Recipe> findByNameContaining(String name);
+    List<Recipe> findByDisabled(Boolean disabled);
 }

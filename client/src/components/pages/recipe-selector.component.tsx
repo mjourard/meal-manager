@@ -1,6 +1,6 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
-import RecipesDataService from '../../services/recipes.service';
+import { useRecipesService } from '../../services/recipes.service';
 import { Recipe } from '../../models/recipe';
 
 const RecipeSelector: React.FC = () => {
@@ -8,6 +8,7 @@ const RecipeSelector: React.FC = () => {
   const [currentRecipe, setCurrentRecipe] = useState<Recipe | null>(null);
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
   const [searchName, setSearchName] = useState<string>('');
+  const recipesService = useRecipesService();
 
   useEffect(() => {
     retrieveRecipes();
@@ -20,7 +21,7 @@ const RecipeSelector: React.FC = () => {
 
   const retrieveRecipes = async () => {
     try {
-      const data = await RecipesDataService.getAll();
+      const data = await recipesService.getAll();
       setRecipes(data);
     } catch (error) {
       console.error('Error retrieving recipes:', error);
@@ -40,7 +41,7 @@ const RecipeSelector: React.FC = () => {
 
   const removeAllRecipes = async () => {
     try {
-      await RecipesDataService.deleteAll();
+      await recipesService.deleteAll();
       refreshList();
     } catch (error) {
       console.error('Error removing all recipes:', error);
@@ -49,7 +50,7 @@ const RecipeSelector: React.FC = () => {
 
   const findByName = async () => {
     try {
-      const allRecipes = await RecipesDataService.getAll();
+      const allRecipes = await recipesService.getAll();
       // Filter recipes by name if search term exists
       if (searchName) {
         const filteredRecipes = allRecipes.filter(recipe => 
