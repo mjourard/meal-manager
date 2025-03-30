@@ -4,3 +4,7 @@ local.*.env
 .env.api
 .env.reciever
 client-cra
+
+# Logs
+logs/**/*
+!logs/**/.gitkeep

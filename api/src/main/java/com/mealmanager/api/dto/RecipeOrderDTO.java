@@ -11,8 +11,16 @@ public class RecipeOrderDTO {
         return this.selectedRecipes;
     }
 
+    public void setSelectedRecipes(List<Long> selectedRecipes) {
+        this.selectedRecipes = selectedRecipes;
+    }
+
     public List<Long> getSelectedUserIds() {
         return this.selectedUserIds;
+    }
+
+    public void setSelectedUserIds(List<Long> selectedUserIds) {
+        this.selectedUserIds = selectedUserIds;
     }
 
     public String getMessage() {
@@ -20,5 +28,9 @@ public class RecipeOrderDTO {
             return "";
         }
         return this.message;
+    }
+    
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

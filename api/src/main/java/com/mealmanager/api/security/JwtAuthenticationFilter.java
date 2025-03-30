@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,10 +34,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwkProvider jwkProvider;
     private final JwtConfig jwtConfig;
+    private final boolean debugEnabled;
 
-    public JwtAuthenticationFilter(JwkProvider jwkProvider, JwtConfig jwtConfig) {
+    public JwtAuthenticationFilter(
+            JwkProvider jwkProvider, 
+            JwtConfig jwtConfig,
+            @Value("${app.debug.enabled:false}") boolean debugEnabled) {
         this.jwkProvider = jwkProvider;
         this.jwtConfig = jwtConfig;
+        this.debugEnabled = debugEnabled;
+        
+        if (debugEnabled) {
+            log.warn("JWT Debug mode is enabled. This should not be used in production!");
+        }
     }
 
     @Override
@@ -45,12 +55,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             Optional<String> token = getJwtFromRequest(request);
             if (token.isPresent()) {
-                log.debug("JWT token found in request");
+                if (debugEnabled) {
+                    log.debug("JWT token found in request");
+                }
                 validateToken(token.get())
                         .ifPresentOrElse(
                             jwt -> {
                                 setAuthentication(jwt);
-                                log.debug("Authentication successful for user: {}", jwt.getSubject());
+                                if (debugEnabled) {
+                                    log.debug("Authentication successful for user: {}", jwt.getSubject());
+                                }
                             },
                             () -> log.warn("Failed to validate JWT token")
                         );
@@ -72,49 +86,72 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private Optional<DecodedJWT> validateToken(String token) {
         try {
-            log.debug("Validating JWT token");
+            // Only decode and log token details if debug is enabled
+            if (debugEnabled) {
+                log.debug("Validating JWT token");
+                DecodedJWT debugJwt = JWT.decode(token);
+                log.debug("JWT Subject: {}", debugJwt.getSubject());
+                log.debug("JWT Issuer: {}", debugJwt.getIssuer());
+                log.debug("JWT Key ID: {}", debugJwt.getKeyId());
+            }
+            
+            // Safe decoding for actual verification
             DecodedJWT jwt = JWT.decode(token);
-            
-            // Log token details for debugging
-            log.debug("JWT Subject: {}", jwt.getSubject());
-            log.debug("JWT Issuer: {}", jwt.getIssuer());
-            log.debug("JWT Key ID: {}", jwt.getKeyId());
-            
             String keyId = jwt.getKeyId();
             if (keyId == null) {
                 log.error("JWT key ID is missing");
                 return Optional.empty();
             }
 
-            log.debug("Fetching JWK for key ID: {}", keyId);
+            if (debugEnabled) {
+                log.debug("Fetching JWK for key ID: {}", keyId);
+            }
+            
             Jwk jwk = jwkProvider.get(keyId);
             Algorithm algorithm = Algorithm.RSA256((RSAPublicKey) jwk.getPublicKey(), null);
 
             // Build the verification with required claims
-            log.debug("Configuring JWT verification with issuer: {}", jwtConfig.getIssuer());
+            if (debugEnabled) {
+                log.debug("Configuring JWT verification with issuer: {}", jwtConfig.getIssuer());
+            }
+            
             Verification verification = JWT.require(algorithm)
                     .withIssuer(jwtConfig.getIssuer());
             
             // Only add audience check if configured
             String audience = jwtConfig.getAudience();
             if (audience != null && !audience.trim().isEmpty()) {
-                log.debug("Adding audience verification: {}", audience);
+                if (debugEnabled) {
+                    log.debug("Adding audience verification: {}", audience);
+                }
                 verification = verification.withAudience(audience);
-            } else {
+            } else if (debugEnabled) {
                 log.debug("No audience configured, skipping audience verification");
             }
             
             // Verify the token
-            log.debug("Verifying JWT token");
+            if (debugEnabled) {
+                log.debug("Verifying JWT token");
+            }
+            
             jwt = verification.build().verify(token);
-            log.debug("JWT token verified successfully");
+            
+            if (debugEnabled) {
+                log.debug("JWT token verified successfully");
+            }
 
             return Optional.of(jwt);
         } catch (JWTVerificationException e) {
-            log.error("JWT verification failed: {}", e.getMessage(), e);
+            log.error("JWT verification failed: {}", e.getMessage());
+            if (debugEnabled) {
+                log.debug("JWT verification exception details:", e);
+            }
             return Optional.empty();
         } catch (Exception e) {
-            log.error("JWT processing error: {}", e.getMessage(), e);
+            log.error("JWT processing error: {}", e.getMessage());
+            if (debugEnabled) {
+                log.debug("JWT processing exception details:", e);
+            }
             return Optional.empty();
         }
     }

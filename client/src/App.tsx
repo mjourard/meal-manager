@@ -2,7 +2,6 @@ import './App.css'
 import { 
     SignIn, 
     SignUp, 
-    UserProfile, 
     UserButton, 
     SignedIn, 
     SignedOut,
@@ -17,7 +16,7 @@ import Home from "./components/pages/home.component";
 import AddRecipe from "./components/pages/add-recipe.component";
 import EditRecipe from "./components/pages/edit-recipe.component";
 import DisplayRecipes from "./components/pages/display-recipes.component";
-import RecipeSelector from "./components/pages/recipe-selector.component";
+import CreateOrder from "./components/pages/create-order.component";
 import DisplayOrders from "./components/pages/display-orders.component";
 import EditOrder from "./components/pages/edit-order.component";
 import DisplayUsers from "./components/pages/display-users.component";
@@ -27,7 +26,7 @@ function App() {
   return (
       <Router>
         <nav className="navbar fixed-top navbar-expand navbar-dark bg-dark">
-          <a href={"/recipes"} className="navbar-brand">
+          <a href={"/"} className="navbar-brand">
             Meal Manager
           </a>
           <div className="navbar-nav mr-auto">
@@ -37,13 +36,13 @@ function App() {
               </Link>
             </li>
             <li className="nav-item">
-              <Link to={"/add"} className="nav-link">
+              <Link to={"/recipes/new"} className="nav-link">
                 Add
               </Link>
             </li>
             <li className={"nav-item"}>
-              <Link to={"/choose-recipes"} className={"nav-link"}>
-                Choose Recipes
+              <Link to={"/orders/new"} className={"nav-link"}>
+                Create Order
               </Link>
             </li>
             <li className={"nav-item"}>
@@ -76,9 +75,9 @@ function App() {
             
             {/* Protected routes */} 
             <Route path="/recipes" element={<RequireAuth><DisplayRecipes /></RequireAuth>} />
-            <Route path="/add" element={<RequireAuth><AddRecipe /></RequireAuth>} />
+            <Route path="/recipes/new" element={<RequireAuth><AddRecipe /></RequireAuth>} />
             <Route path="/recipes/:id" element={<RequireAuth><EditRecipe /></RequireAuth>} />
-            <Route path="/choose-recipes" element={<RequireAuth><RecipeSelector /></RequireAuth>} />
+            <Route path="/orders/new" element={<RequireAuth><CreateOrder /></RequireAuth>} />
             <Route path="/orders" element={<RequireAuth><DisplayOrders /></RequireAuth>} />
             <Route path="/orders/:id" element={<RequireAuth><EditOrder /></RequireAuth>} />
             <Route path="/users" element={<RequireAuth><DisplayUsers /></RequireAuth>} />
@@ -90,7 +89,7 @@ function App() {
 }
 
 // RequireAuth component to protect routes
-function RequireAuth({ children }) {
+function RequireAuth({ children }: { children: React.ReactNode }) {
     return (
       <>
         <SignedIn>{children}</SignedIn>

@@ -46,8 +46,21 @@ const DisplayOrders: React.FC = () => {
     }
   };
 
-  const formatDate = (dateString: Date) => {
-    return new Date(dateString).toLocaleDateString();
+  const formatDate = (dateString: Date | string | null) => {
+    if (!dateString) {
+      return "No date available";
+    }
+    try {
+      const date = new Date(dateString);
+      // Check if date is valid (Invalid Date is not equal to itself in JavaScript)
+      if (date.toString() === 'Invalid Date') {
+        return "No date available";
+      }
+      return date.toLocaleDateString();
+    } catch (e) {
+      console.error("Error formatting date:", e);
+      return "No date available";
+    }
   };
 
   if (loading) {

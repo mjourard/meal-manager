@@ -2,6 +2,7 @@ package com.mealmanager.api.config;
 
 import com.auth0.jwk.JwkProvider;
 import com.mealmanager.api.security.JwtAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,12 +23,17 @@ public class SecurityConfig {
     private final JwkProvider jwkProvider;
     private final JwtConfig jwtConfig;
     private final String allowedOrigin;
+    private final boolean debugEnabled;
 
-    public SecurityConfig(JwkProvider jwkProvider, JwtConfig jwtConfig, 
-                         @org.springframework.beans.factory.annotation.Value("${cors.allowed.origin}") String allowedOrigin) {
+    public SecurityConfig(
+            JwkProvider jwkProvider, 
+            JwtConfig jwtConfig, 
+            @Value("${cors.allowed.origin}") String allowedOrigin,
+            @Value("${app.debug.enabled:false}") boolean debugEnabled) {
         this.jwkProvider = jwkProvider;
         this.jwtConfig = jwtConfig;
         this.allowedOrigin = allowedOrigin;
+        this.debugEnabled = debugEnabled;
     }
 
     @Bean
@@ -53,7 +59,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwkProvider, jwtConfig);
+        return new JwtAuthenticationFilter(jwkProvider, jwtConfig, debugEnabled);
     }
 
     @Bean

@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { CreateSysUser, UpdateSysUser, DisplaySysUser } from "../models/sys-user";
 import { useAuthClient } from './client';
+import { logger } from './logging.service'; // Import the global logger
 
 export const useSysUsersService = () => {
   const authClient = useAuthClient();
@@ -23,11 +24,13 @@ export const useSysUsersService = () => {
 
   const getDefaultChecked = useCallback(async (): Promise<DisplaySysUser[]> => {
     try {
-      const response = await authClient.get('/users/defaultchecked');
-      if (response.status === 204) {
-        return [];
-      }
-      return response.data;
+      // Since there's no specific endpoint for defaultChecked users,
+      // fetch all users and filter the ones with defaultChecked=true
+      logger.debug('Fetching all users to filter defaultChecked', 'SysUsersService');
+      const allUsers = await getAll();
+      const defaultCheckedUsers = allUsers.filter(user => user.defaultChecked === true);
+      logger.debug(`Found ${defaultCheckedUsers.length} defaultChecked users out of ${allUsers.length} total users`, 'SysUsersService');
+      return defaultCheckedUsers;
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Failed to fetch default checked SysUsers: ${error.message}`, { cause: error });
@@ -35,7 +38,7 @@ export const useSysUsersService = () => {
         throw new Error(`Failed to fetch default checked SysUsers: ${JSON.stringify(error)}`);
       }
     }
-  }, [authClient]);
+  }, [authClient, getAll]);
 
   const get = useCallback(async (id: number): Promise<DisplaySysUser> => {
     try {
