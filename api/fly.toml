@@ -1,6 +1,6 @@
 # fly.toml - Fly.io configuration for Meal Manager API
 app = "meal-manager"
-primary_region = "ewr"
+primary_region = "yul"
 
 [build]
   dockerfile = "Dockerfile.fly"
