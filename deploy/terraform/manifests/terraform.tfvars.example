@@ -1,0 +1,29 @@
+# Sample terraform.tfvars file
+# Copy this file to terraform.tfvars and fill in your values
+
+# Deployment Environment
+environment = "prod"
+
+# AWS Configuration
+aws_region = "us-east-1"
+
+# Domain Configuration
+domain_name = "example.com"  # Replace with your actual domain
+
+# Render Configuration (for frontend)
+render_api_key = "rnd_XXXXXXXXXXXXXXXXXXXXXXXXXXXX"  # Replace with your Render API key
+render_team_name = "your-team"  # This variable is kept for backward compatibility but is no longer required
+
+# Fly.io Configuration
+fly_api_token = "fly_XXXXXXXXXXXXXXXXXXXX"  # Replace with your Fly.io API token
+fly_org = "personal"  # Your Fly.io organization
+fly_region = "yul"  # Region to deploy to
+fly_app_name = "meal-manager"  # Your main app name
+fly_db_name = "meal-manager-db"  # PostgreSQL app name
+fly_rabbitmq_name = "meal-manager-mq"  # RabbitMQ app name
+postgres_password = "super-secret-password"  # Set a strong password for your database
+fly_api_image = "ghcr.io/mjourard/meal-manager-api:latest"  # Docker image from GitHub Container Registry
+
+# Git Repository - Update if you've forked the repository
+repository_url = "https://github.com/mjourard/meal-manager"
+repository_branch = "main"  # Change if deploying from a different branch 

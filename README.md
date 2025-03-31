@@ -6,7 +6,7 @@ A Web app for managing the meals we eat as a household.
 
 Coming soon
 
-## Startup Instructions
+## Development Setup
 
 Requires docker, mvn and npm
 
@@ -19,6 +19,19 @@ docker-compose -f docker-compose.prod.yml --env-file ../env-files/.env up
 ```
 
 And you're good to go
+
+## Deployment
+
+The application is deployed using a combination of GitHub Actions and Terraform:
+
+1. **API Docker Image**: Built and pushed to GitHub Container Registry via GitHub Actions
+2. **Infrastructure**: Managed via Terraform for all cloud resources
+
+For detailed deployment instructions, see [deploy/terraform/README.md](deploy/terraform/README.md).
+
+## Debugging
+
+For information on debugging issues with the application, see [DEBUGGING.md](DEBUGGING.md).
 
 ## Implementation Plan:
 Check [the project page](https://github.com/mjourard/meal-manager/projects/1) for the most up-to-date implementation plan.
