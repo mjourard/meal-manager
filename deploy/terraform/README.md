@@ -14,6 +14,15 @@ The infrastructure is deployed across multiple cloud providers to optimize for c
 
 For a visual representation of the architecture, see [the architecture diagram](manifests/architecture.md).
 
+## Deployment Process Overview
+
+The deployment process follows these steps:
+
+1. **Build & Push API Docker Image**: This is done via GitHub Actions workflow
+2. **Deploy Infrastructure**: This is done via Terraform, which manages all cloud resources
+
+This separation allows for secure handling of secrets and a cleaner deployment workflow.
+
 ## Prerequisites
 
 Before you begin, you'll need:
@@ -23,7 +32,7 @@ Before you begin, you'll need:
 3. A Fly.io account
 4. Terraform CLI installed locally (v1.0.0+)
 5. AWS CLI configured with appropriate credentials
-6. Docker installed locally for building and deploying images
+6. GitHub repository with GitHub Actions enabled
 
 ## Initial Setup
 
@@ -37,30 +46,22 @@ cd deploy/terraform/scripts
 ./bootstrap-terraform-backend.sh
 ```
 
-### 2. Deploy Backend Resources to Fly.io
+### 2. Build and Push the API Docker Image
 
-For Fly.io deployments, we provide scripts to automate the process:
+The Docker image for the API is built and pushed to GitHub Container Registry using GitHub Actions:
 
-1. Install the Fly.io CLI:
-   ```bash
-   curl -L https://fly.io/install.sh | sh
-   ```
+1. Set up the required GitHub repository secrets:
+   - `GITHUB_TOKEN` (automatically provided)
 
-2. Log in to your Fly.io account:
-   ```bash
-   fly auth login
-   ```
+2. Trigger the GitHub Actions workflow:
+   - Push to the main branch, or
+   - Manually trigger the workflow from the GitHub Actions tab
 
-3. Deploy all backend resources using the provided script:
-   ```bash
-   cd deploy/scripts
-   POSTGRES_PASSWORD=your_secure_password ./deploy-all-to-fly.sh
-   ```
-
-   This script will:
-   - Create a PostgreSQL instance with persistent storage
-   - Create a RabbitMQ instance with persistent storage
-   - Build and deploy your Spring Boot API using the Dockerfile.fly in the api directory
+3. The workflow will:
+   - Build the Spring Boot application
+   - Create a Docker image using the Dockerfile.fly in the api directory
+   - Push the image to GitHub Container Registry with appropriate tags
+   - Output the full image reference to use in Terraform
 
 ### 3. Configure Terraform Variables
 
@@ -72,6 +73,8 @@ cp terraform.tfvars.example terraform.tfvars
 # Edit the file with your specific values
 vim terraform.tfvars
 ```
+
+Important: Update the `fly_api_image` variable with the full image reference from the GitHub Actions workflow output.
 
 ### 4. Render Custom Domain Configuration
 
@@ -112,15 +115,16 @@ After successful deployment:
 
 When you make changes to the application:
 
-```bash
-# For frontend updates (Render):
-cd deploy/terraform/manifests
-terraform apply
+1. For frontend updates (Render):
+   ```bash
+   cd deploy/terraform/manifests
+   terraform apply
+   ```
 
-# For Fly.io backend updates:
-cd deploy/scripts
-./deploy-to-fly.sh
-```
+2. For API updates:
+   - Push changes to GitHub to trigger the build workflow
+   - Update the `fly_api_image` variable in terraform.tfvars with the new image reference
+   - Run `terraform apply` to deploy the new image
 
 ### Monitoring Costs
 
@@ -139,10 +143,8 @@ To destroy all resources when they're no longer needed:
 cd deploy/terraform/manifests
 terraform destroy
 
-# Remove Fly.io resources:
-fly apps destroy meal-manager
-fly apps destroy meal-manager-db
-fly apps destroy meal-manager-mq
+# Delete container images from GitHub Container Registry if needed
+# (manual process through GitHub interface)
 ```
 
 ## Troubleshooting
@@ -153,5 +155,6 @@ Common issues and solutions:
 2. **Fly.io deployment failures**: Check logs with `fly logs`
 3. **Terraform state issues**: Ensure your S3 bucket and DynamoDB table are correctly configured
 4. **Render custom domain issues**: Check the verification status in the Render dashboard and make sure DNS propagation has completed
+5. **Docker image issues**: Check the GitHub Actions workflow runs for any build or push errors
 
 For more detailed debugging information, see the [DEBUGGING.md](../../DEBUGGING.md) file in the repository root. 

@@ -22,7 +22,7 @@ fly_app_name = "meal-manager"  # Your main app name
 fly_db_name = "meal-manager-db"  # PostgreSQL app name
 fly_rabbitmq_name = "meal-manager-mq"  # RabbitMQ app name
 postgres_password = "super-secret-password"  # Set a strong password for your database
-fly_api_image = "registry.fly.io/meal-manager:latest"  # Your API Docker image
+fly_api_image = "ghcr.io/mjourard/meal-manager-api:latest"  # Docker image from GitHub Container Registry
 
 # Git Repository - Update if you've forked the repository
 repository_url = "https://github.com/mjourard/meal-manager"
