@@ -21,6 +21,7 @@
         <version.com.h2database.h2>1.4.200</version.com.h2database.h2>
         <version.org.junit.jupiter>5.4.2</version.org.junit.jupiter>
         <version.org.testcontainers>1.15.3</version.org.testcontainers>
+        <envfile.skip>false</envfile.skip>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -147,7 +148,7 @@
                             <goal>loadenv</goal>
                         </goals>
                         <configuration>
-                            <skip>true</skip>
+                            <skip>${envfile.skip}</skip>
                         </configuration>
                     </execution>
                 </executions>
