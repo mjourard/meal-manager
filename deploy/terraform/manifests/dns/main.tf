@@ -20,6 +20,12 @@ resource "render_static_site" "frontend" {
     VITE_CLERK_PUBLISHABLE_KEY = {
       value = var.clerk_config.publishable_key
     }
+    VITE_CLERK_SIGN_IN_URL = {
+      value = var.clerk_config.sign_in_url
+    }
+    VITE_CLERK_SIGN_UP_URL = {
+      value = var.clerk_config.sign_up_url
+    }
   }
 
   custom_domains = [
