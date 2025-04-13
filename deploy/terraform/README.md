@@ -12,7 +12,7 @@ The infrastructure is deployed across multiple cloud providers to optimize for c
 - **Message Broker**: RabbitMQ on Fly.io
 - **DNS**: AWS Route53 for domain management
 
-For a visual representation of the architecture, see [the architecture diagram](manifests/architecture.md).
+For a visual representation of the architecture, see [the architecture diagram](manifests/ARCHITECTURE.md).
 
 ## Deployment Process Overview
 

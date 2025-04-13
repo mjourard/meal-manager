@@ -1,18 +1,27 @@
 # Render static site for React frontend
+locals {
+  render_frontend_name = "meal-manager-frontend"
+}
+
 resource "render_static_site" "frontend" {
-  name          = "meal-manager-frontend"
-  repo_url      = var.repository_url
-  build_command = "cd client && npm install && npm run build"
-  
+  name           = local.render_frontend_name
+  repo_url       = var.repository_url
+  root_directory = "client"
+  build_command  = "npm install && npm run build"
+
   branch       = var.repository_branch
-  publish_path = "client/dist"
-  
+  publish_path = "dist"
+
+
   env_vars = {
-    VITE_API_BASE_URL = {
+    VITE_MEALMANAGER_BASE_URL = {
       value = "https://api.${var.domain_name}/api"
     }
+    VITE_CLERK_PUBLISHABLE_KEY = {
+      value = var.clerk_publishable_key
+    }
   }
-  
+
   custom_domains = [
     { name = "app.${var.domain_name}" }
   ]
@@ -26,7 +35,7 @@ resource "aws_route53_record" "frontend" {
   name    = "app.${var.domain_name}"
   type    = "CNAME"
   ttl     = 300
-  records = [render_static_site.frontend.default_domain]
+  records = ["${local.render_frontend_name}.onrender.com"]
 }
 
 # DNS record for API on Fly.io

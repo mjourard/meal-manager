@@ -1,0 +1,20 @@
+# Sample terraform.tfvars file
+# Copy this file to terraform.tfvars and fill in your values
+
+# Deployment Environment
+environment = "prod"
+
+# AWS Configuration
+aws_region = "us-east-1"
+
+# Domain Configuration
+domain_name = "example.com"  # Replace with your actual domain
+
+# Render Configuration (for frontend)
+render_api_key = "rnd_XXXXXXXXXXXXXXXXXXXXXXXXXXXX"  # Replace with your Render API key
+render_owner_id = "tea-cvkrj99r0fns73867d00"
+clerk_publishable_key = ""
+
+# Git Repository - Update if you've forked the repository
+repository_url = "https://github.com/mjourard/meal-manager"
+repository_branch = "main"  # Change if deploying from a different branch 
