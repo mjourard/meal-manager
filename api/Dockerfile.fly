@@ -11,21 +11,6 @@ RUN addgroup --system --gid 1001 appgroup && \
 ENV SERVER_PORT=8080
 ENV SPRING_PROFILES_ACTIVE=prod
 
-# The following environment variables should be provided at runtime:
-# Database configuration:
-# - SPRING_DATASOURCE_URL=jdbc:postgresql://hostname:5432/dbname
-# - SPRING_DATASOURCE_USERNAME=username
-# - SPRING_DATASOURCE_PASSWORD=password
-#
-# RabbitMQ configuration:
-# - SPRING_RABBITMQ_HOST=hostname
-# - SPRING_RABBITMQ_PORT=5672
-# - SPRING_RABBITMQ_USERNAME=username
-# - SPRING_RABBITMQ_PASSWORD=password
-#
-# API URL for client:
-# - API_BASE_URL=https://api.example.com
-
 # Copy the JAR file
 COPY target/*.jar app.jar
 

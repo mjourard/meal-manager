@@ -8,11 +8,22 @@ primary_region = "yul"
 [env]
   SERVER_PORT = "8080"
   SPRING_PROFILES_ACTIVE = "prod"
+  DB_HOST = "meal-manager-db.flycast"
+  DB_PORT = "5432"
+  DB_NAME = "meal_manager"
+  DB_QUERY_PARAMS = "?sslmode=disable"
+  RABBITMQ_HOST = "meal-manager-mq.internal"
+  RABBITMQ_PORT = "5672"
+  MEALMANAGER_EMAIL_FROM = "no-reply@mealmanager.org"
+  CORS_ALLOWED_ORIGIN = "https://app.mealmanager.org"
+  AWS_SES_REGION = "us-east-1"
+  CLERK_JWKS_URI = "https://clerk.mealmanager.org/.well-known/jwks.json"
+  CLERK_ISSUER = "https://clerk.mealmanager.org"
 
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = "stop"
   auto_start_machines = true
   min_machines_running = 0
   processes = ["app"]
@@ -38,7 +49,7 @@ primary_region = "yul"
     timeout = "2s"
     grace_period = "30s"
     method = "GET"
-    path = "/actuator/health"
+    path = "/api/healthcheck"
     protocol = "http"
 
 [metrics]
