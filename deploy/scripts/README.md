@@ -217,6 +217,57 @@ Options:
 - `-x MAX_COUNT`: Set maximum number of instances
 - `-s`: Show current scaling settings
 
+### Database Initialization: `fly-db-init.sh`
+
+Configure and initialize database with Flyway migrations.
+
+```bash
+# Configure default app and database for Flyway
+./deploy/scripts/fly-db-init.sh
+
+# Configure custom app and database names for Flyway
+./deploy/scripts/fly-db-init.sh -a custom-app -d custom-db
+
+# Show help
+./deploy/scripts/fly-db-init.sh -h
+```
+
+This script sets up all necessary environment variables for Spring Boot and Flyway to connect to your PostgreSQL database and manage migrations automatically when your application starts.
+
+Options:
+- `-a APP_NAME`: Application name (default: from fly.env)
+- `-d DB_APP_NAME`: Database app name (default: from fly.env)
+
+### SSL Certificate Management: `fly-cert.sh`
+
+Manage SSL certificates for your custom domains on Fly.io.
+
+```bash
+# Add certificate for api.mealmanager.org (default)
+./deploy/scripts/fly-cert.sh
+
+# Add certificate for a different domain
+./deploy/scripts/fly-cert.sh -d custom.example.com
+
+# List all certificates
+./deploy/scripts/fly-cert.sh list
+
+# Check certificate status
+./deploy/scripts/fly-cert.sh check
+
+# Remove a certificate
+./deploy/scripts/fly-cert.sh remove
+
+# Show help
+./deploy/scripts/fly-cert.sh -h
+```
+
+This script helps you manage SSL certificates for your custom domains, automatically handling the certificate creation, validation, and status checking.
+
+Options:
+- `-a APP_NAME`: Application name (default: from fly.env)
+- `-d DOMAIN`: Domain name (default: api.mealmanager.org)
+
 ## Complete Deployment Workflow
 
 Here's a typical workflow for deploying the complete Meal Manager application stack:
@@ -241,18 +292,31 @@ Here's a typical workflow for deploying the complete Meal Manager application st
    ./deploy/scripts/fly-secrets.sh import fly_secrets.env.dist
    ```
 
-5. **Attach Database and RabbitMQ to API**:
+5. **Setup Database for Flyway Migration**:
+   ```bash
+   ./deploy/scripts/fly-db-init.sh
+   ```
+
+6. **Attach Database and RabbitMQ to API**:
    ```bash
    ./deploy/scripts/fly-postgres.sh attach meal-manager
    ./deploy/scripts/fly-rabbitmq.sh attach meal-manager
    ```
 
-6. **Deploy API Application**:
+7. **Deploy API Application**:
    ```bash
    ./deploy/scripts/fly-deploy.sh
    ```
 
-7. **Scale as Needed**:
+8. **Add Custom Domain and SSL Certificate**:
+   ```bash
+   # Make sure your DNS has a CNAME record pointing api.mealmanager.org to meal-manager.fly.dev
+   ./deploy/scripts/fly-cert.sh
+   # Check certificate status
+   ./deploy/scripts/fly-cert.sh check
+   ```
+
+9. **Scale as Needed**:
    ```bash
    ./deploy/scripts/fly-scale.sh -n 2 -x 5
    ```

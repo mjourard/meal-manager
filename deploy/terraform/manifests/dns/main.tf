@@ -18,7 +18,7 @@ resource "render_static_site" "frontend" {
       value = "https://api.${var.domain_name}/api"
     }
     VITE_CLERK_PUBLISHABLE_KEY = {
-      value = var.clerk_publishable_key
+      value = var.clerk_config.publishable_key
     }
   }
 
@@ -46,3 +46,44 @@ resource "aws_route53_record" "api" {
   ttl     = 300
   records = ["${var.fly_app_name}.fly.dev"]
 } 
+
+# DNS records for Clerk authentication
+resource "aws_route53_record" "clerk_main" {
+  zone_id = data.aws_route53_zone.main.zone_id
+  name    = "clerk"
+  type    = "CNAME"
+  ttl     = 300
+  records = [var.clerk_config.cname_clerk]
+}
+
+resource "aws_route53_record" "clerk_accounts" {
+  zone_id = data.aws_route53_zone.main.zone_id
+  name    = "accounts"
+  type    = "CNAME"
+  ttl     = 300
+  records = [var.clerk_config.cname_accounts]
+}
+
+resource "aws_route53_record" "clerk_email" {
+  zone_id = data.aws_route53_zone.main.zone_id
+  name    = "clk._domainkey"
+  type    = "CNAME"
+  ttl     = 300
+  records = [var.clerk_config.cname_email_clk]
+}
+
+resource "aws_route53_record" "clerk_email2" {
+  zone_id = data.aws_route53_zone.main.zone_id
+  name    = "clk2._domainkey"
+  type    = "CNAME"
+  ttl     = 300
+  records = [var.clerk_config.cname_email_clk2]
+}
+
+resource "aws_route53_record" "clerk_email_mail" {
+  zone_id = data.aws_route53_zone.main.zone_id
+  name    = "clkmail"
+  type    = "CNAME"
+  ttl     = 300
+  records = [var.clerk_config.cname_email_clkmail]
+}

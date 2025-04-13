@@ -34,11 +34,6 @@ variable "render_owner_id" {
   # This should be set in your terraform.tfvars file or as an environment variable
 }
 
-variable "clerk_publishable_key" {
-  description = "The Clerk publishabl key"
-  type        = string
-}
-
 variable "repository_url" {
   description = "URL of the Git repository"
   type        = string
@@ -57,3 +52,14 @@ variable "fly_app_name" {
   default     = "meal-manager"
 }
 
+variable "clerk_config" {
+  description = "The Clerk publishable key"
+  type        = object({
+    publishable_key = string
+    cname_clerk = string
+    cname_accounts = string
+    cname_email_clk = string
+    cname_email_clk2 = string
+    cname_email_clkmail = string
+  })
+}
