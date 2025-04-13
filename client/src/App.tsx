@@ -21,6 +21,8 @@ import DisplayOrders from "./components/pages/display-orders.component";
 import EditOrder from "./components/pages/edit-order.component";
 import DisplayUsers from "./components/pages/display-users.component";
 import EditUser from "./components/pages/edit-user.component";
+import ContactUs from "./components/pages/contact-us.component";
+import BuildInfoPage from "./components/pages/build-info.component";
 
 function App() {
   return (
@@ -57,6 +59,23 @@ function App() {
                 Users
               </Link>
             </li>
+            <li className="nav-item dropdown">
+              <a className="nav-link dropdown-toggle" href="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                About
+              </a>
+              <ul className="dropdown-menu" aria-labelledby="aboutDropdown">
+                <li>
+                  <Link to="/contact-us" className="dropdown-item">
+                    Contact Us
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/build-info" className="dropdown-item">
+                    Build Info
+                  </Link>
+                </li>
+              </ul>
+            </li>
           </div>
           <SignedIn>
             <UserButton />
@@ -74,6 +93,8 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/sign-in/*" element={<SignIn routing="path" path="/sign-in" />} />
             <Route path="/sign-up/*" element={<SignUp routing="path" path="/sign-up" />} />
+            <Route path="/contact-us" element={<ContactUs />} />
+            <Route path="/build-info" element={<BuildInfoPage />} />
             
             {/* Protected routes */} 
             <Route path="/recipes" element={<RequireAuth><DisplayRecipes /></RequireAuth>} />

@@ -61,5 +61,7 @@ variable "clerk_config" {
     cname_email_clk = string
     cname_email_clk2 = string
     cname_email_clkmail = string
+    sign_in_url = string
+    sign_up_url = string
   })
 }

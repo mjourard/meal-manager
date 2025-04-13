@@ -50,6 +50,7 @@ public class SecurityConfig {
                 .antMatchers("/api/health").permitAll()
                 .antMatchers("/api/healthcheck").permitAll()
                 .antMatchers("/api/recipes/public/**").permitAll()
+                .antMatchers("/api/buildinfo").permitAll()
                 // Secured endpoints
                 .anyRequest().authenticated()
             .and()
