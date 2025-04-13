@@ -63,8 +63,8 @@ function App() {
           </SignedIn>
           <SignedOut>
             <div className="navbar-nav mr-auto">
-              <a href="/sign-in" className="btn btn-outline-light">Sign In</a>
-              <a href="/sign-up" className="btn btn-outline-light">Sign Up</a>
+              <a href={import.meta.env.VITE_CLERK_SIGN_IN_URL} className="btn btn-outline-light">Sign In</a>
+              <a href={import.meta.env.VITE_CLERK_SIGN_UP_URL} className="btn btn-outline-light">Sign Up</a>
             </div>
           </SignedOut>
         </nav>
