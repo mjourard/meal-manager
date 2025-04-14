@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import BuildInfoService, { BuildInfo } from '../../services/BuildInfoService';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { BuildInfo, useBuildInfoService } from '../../services/build-info.service';
 
 const BuildInfoPage: React.FC = () => {
+  const { getBuildInfo } = useBuildInfoService();
   const [buildInfo, setBuildInfo] = useState<BuildInfo>({
     version: 'Loading...',
     buildTimestamp: 'Loading...',
@@ -11,21 +12,27 @@ const BuildInfoPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const clientVersion = import.meta.env.VITE_APP_VERSION || 'Unknown';
+  const fetchCompleted = useRef(false);
+
+  const fetchData = useCallback(async () => {
+    if (fetchCompleted.current) return;
+    
+    try {
+      const data = await getBuildInfo();
+      setBuildInfo(data);
+      setLoading(false);
+    } catch (error) {
+      setError('Failed to load build information. Please try again later.');
+      console.error('Error fetching build info:', error);
+      setLoading(false);
+    } finally {
+      fetchCompleted.current = true;
+    }
+  }, [getBuildInfo]);
 
   useEffect(() => {
-    const fetchBuildInfo = async () => {
-      try {
-        const data = await BuildInfoService.getBuildInfo();
-        setBuildInfo(data);
-        setLoading(false);
-      } catch {
-        setError('Failed to load build information. Please try again later.');
-        setLoading(false);
-      }
-    };
-
-    fetchBuildInfo();
-  }, []);
+    fetchData();
+  }, [fetchData]);
 
   if (loading) {
     return (
