@@ -19,6 +19,7 @@ primary_region = "yul"
   AWS_SES_REGION = "us-east-1"
   CLERK_JWKS_URI = "https://clerk.mealmanager.org/.well-known/jwks.json"
   CLERK_ISSUER = "https://clerk.mealmanager.org"
+  API_URL = "https://api.mealmanager.org"
 
 [http_service]
   internal_port = 8080

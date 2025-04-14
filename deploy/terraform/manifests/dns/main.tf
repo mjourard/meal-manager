@@ -15,7 +15,7 @@ resource "render_static_site" "frontend" {
 
   env_vars = {
     VITE_MEALMANAGER_BASE_URL = {
-      value = "https://api.${var.domain_name}/api"
+      value = "https://api.${var.domain_name}"
     }
     VITE_CLERK_PUBLISHABLE_KEY = {
       value = var.clerk_config.publishable_key
