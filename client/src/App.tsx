@@ -28,64 +28,68 @@ function App() {
   return (
       <Router>
         <nav className="navbar fixed-top navbar-expand navbar-dark bg-dark">
-          <li className="navbar-brand">
-            <Link to={"/"}  className="nav-link">
-              Meal Manager
-            </Link>
-          </li>
-          <div className="navbar-nav mr-auto">
-            <li className="nav-item">
-              <Link to="/recipes" className="nav-link">
-                Recipes
+          <div className="container-fluid">
+            <li className="navbar-brand">
+              <Link to={"/"}  className="nav-link">
+                Meal Manager
               </Link>
             </li>
-            <li className="nav-item">
-              <Link to={"/recipes/new"} className="nav-link">
-                Add
-              </Link>
-            </li>
-            <li className={"nav-item"}>
-              <Link to={"/orders/new"} className={"nav-link"}>
-                Create Order
-              </Link>
-            </li>
-            <li className={"nav-item"}>
-              <Link to={"/orders"} className={"nav-link"}>
-                Orders
-              </Link>
-            </li>
-            <li className={"nav-item"}>
-              <Link to={"/users"} className={"nav-link"}>
-                Users
-              </Link>
-            </li>
-            <li className="nav-item dropdown">
-              <a className="nav-link dropdown-toggle" href="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                About
-              </a>
-              <ul className="dropdown-menu" aria-labelledby="aboutDropdown">
-                <li>
-                  <Link to="/contact-us" className="dropdown-item">
-                    Contact Us
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/build-info" className="dropdown-item">
-                    Build Info
-                  </Link>
-                </li>
-              </ul>
-            </li>
-          </div>
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
-          <SignedOut>
-            <div className="navbar-nav mr-auto">
-              <a href={import.meta.env.VITE_CLERK_SIGN_IN_URL} className="btn btn-outline-light">Sign In</a>
-              <a href={import.meta.env.VITE_CLERK_SIGN_UP_URL} className="btn btn-outline-light">Sign Up</a>
+            <div className="navbar-nav me-auto">
+              <li className="nav-item">
+                <Link to="/recipes" className="nav-link">
+                  Recipes
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link to={"/recipes/new"} className="nav-link">
+                  Add
+                </Link>
+              </li>
+              <li className={"nav-item"}>
+                <Link to={"/orders/new"} className={"nav-link"}>
+                  Create Order
+                </Link>
+              </li>
+              <li className={"nav-item"}>
+                <Link to={"/orders"} className={"nav-link"}>
+                  Orders
+                </Link>
+              </li>
+              <li className={"nav-item"}>
+                <Link to={"/users"} className={"nav-link"}>
+                  Users
+                </Link>
+              </li>
+              <li className="nav-item dropdown">
+                <a className="nav-link dropdown-toggle" href="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  About
+                </a>
+                <ul className="dropdown-menu" aria-labelledby="aboutDropdown">
+                  <li>
+                    <Link to="/contact-us" className="dropdown-item">
+                      Contact Us
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/build-info" className="dropdown-item">
+                      Build Info
+                    </Link>
+                  </li>
+                </ul>
+              </li>
             </div>
-          </SignedOut>
+            <div className="d-flex">
+              <SignedIn>
+                <UserButton />
+              </SignedIn>
+              <SignedOut>
+                <div className="d-flex gap-2">
+                  <a href={import.meta.env.VITE_CLERK_SIGN_IN_URL} className="btn btn-outline-light">Sign In</a>
+                  <a href={import.meta.env.VITE_CLERK_SIGN_UP_URL} className="btn btn-outline-light">Sign Up</a>
+                </div>
+              </SignedOut>
+            </div>
+          </div>
         </nav>
         <div className="container mt-3" id="main-content">
           <Routes> 
