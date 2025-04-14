@@ -20,4 +20,5 @@ alwaysApply: false
 - Never add stubbing or fake data patterns to code that affects the dev or prod environments
 - Never overwrite my .env file without first asking and confirming
 - adhere to code linting rules when you can. If you are going to override a linter rule, ensure you add a comment explaining why you need to override it.
+- utility scripts, whether they are written in bash, python or something else, should always include a comment at the top of the script briefly explaining what the script is intended to be used for.
 

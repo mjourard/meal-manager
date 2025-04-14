@@ -1,0 +1,83 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  test-api:
+    name: Test API (Java)
+    runs-on: ubuntu-latest
+    if: ${{ always() && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.modified, 'api/') || contains(github.event.head_commit.added, 'api/')) }}
+    
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mealmanager_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read Java version from pom.xml
+        id: get_java_version
+        run: |
+          JAVA_VERSION=$(grep -A 1 '<java.version>' api/pom.xml | grep -oP '(?<=>)\d+(?=<)')
+          echo "java_version=$JAVA_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ steps.get_java_version.outputs.java_version }}
+          distribution: 'corretto'
+          cache: maven
+
+      - name: Run tests
+        working-directory: api
+        run: mvn -B test
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: mealmanager_test
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_QUERY_PARAMS: ""
+          APP_ENVIRONMENT: test
+
+  test-client:
+    name: Test Client (TypeScript)
+    runs-on: ubuntu-latest
+    if: ${{ always() && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.modified, 'client/') || contains(github.event.head_commit.added, 'client/')) }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: client/package.json
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: Run tests
+        working-directory: client
+        run: npm test 
