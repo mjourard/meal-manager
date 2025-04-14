@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation template to create an IAM user for Terraform deployments'
+
+Parameters:
+  UserName:
+    Type: String
+    Default: terraform-deployer
+    Description: The name of the IAM user to create
+
+Resources:
+  TerraformDeployerUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        - arn:aws:iam::aws:policy/AmazonRoute53FullAccess
+  
+  TerraformDeployerPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: TerraformDeployerPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - ses:*
+              - iam:CreateRole
+              - iam:DeleteRole
+              - iam:AttachRolePolicy
+              - iam:DetachRolePolicy
+              - iam:PutRolePolicy
+              - iam:DeleteRolePolicy
+              - iam:PassRole
+              - cloudwatch:*
+              - logs:*
+            Resource: '*'
+      Users:
+        - !Ref TerraformDeployerUser
+  
+  TerraformDeployerAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref TerraformDeployerUser
+
+Outputs:
+  TerraformDeployerUserARN:
+    Description: ARN of the created IAM user
+    Value: !GetAtt TerraformDeployerUser.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-UserARN"
+  
+  TerraformDeployerAccessKeyId:
+    Description: Access Key ID for the IAM user
+    Value: !Ref TerraformDeployerAccessKey
+    Export:
+      Name: !Sub "${AWS::StackName}-AccessKeyId"
+  
+  TerraformDeployerSecretAccessKey:
+    Description: Secret Access Key for the IAM user
+    Value: !GetAtt TerraformDeployerAccessKey.SecretAccessKey
+    Export:
+      Name: !Sub "${AWS::StackName}-SecretAccessKey" 
