@@ -63,4 +63,4 @@ As part of the upgrade, we're focusing on adding authentication first
 
 ## Deployment
 
-Currently the react app is deployed in vercel, and it auto-builds on each commit to main.
+Currently the react app is deployed in render, and it auto-builds on each commit to main.
