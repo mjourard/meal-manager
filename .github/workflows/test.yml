@@ -1,16 +1,33 @@
-name: Lint Code
+name: Run Tests
 
 on:
   push:
-    branches: [ '**' ]
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_call:
   workflow_dispatch:
 
 jobs:
-  lint-api:
-    name: Lint API (Java)
+  test-api:
+    name: Test API (Java)
     runs-on: ubuntu-latest
     if: ${{ always() && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.modified, 'api/') || contains(github.event.head_commit.added, 'api/')) }}
+    
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mealmanager_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     
     steps:
       - name: Checkout repository
@@ -21,7 +38,6 @@ jobs:
         run: |
           JAVA_VERSION=$(grep -A 1 '<java.version>' api/pom.xml | grep -oP '(?<=>)\d+(?=<)')
           echo "java_version=$JAVA_VERSION" >> $GITHUB_OUTPUT
-          echo "java_version=$JAVA_VERSION"
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -30,11 +46,20 @@ jobs:
           distribution: 'corretto'
           cache: maven
 
-      - name: Run checkstyle
-        run: cd api && mvn -B checkstyle:check -Denvfile.skip=true
+      - name: Run tests
+        working-directory: api
+        run: mvn -B test
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: mealmanager_test
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_QUERY_PARAMS: ""
+          APP_ENVIRONMENT: test
 
-  lint-client:
-    name: Lint Client (TypeScript)
+  test-client:
+    name: Test Client (TypeScript)
     runs-on: ubuntu-latest
     if: ${{ always() && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.modified, 'client/') || contains(github.event.head_commit.added, 'client/')) }}
     
@@ -53,34 +78,6 @@ jobs:
         working-directory: client
         run: npm ci
 
-      - name: Run ESLint
+      - name: Run tests
         working-directory: client
-        run: npm run lint
-
-  lint-terraform:
-    name: Lint Terraform
-    runs-on: ubuntu-latest
-    if: ${{ always() && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.modified, 'deploy/terraform/') || contains(github.event.head_commit.added, 'deploy/terraform/')) }}
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Read Terraform version
-        id: get_tf_version
-        run: |
-          TF_VERSION=$(grep -A 1 'required_version' deploy/terraform/providers.tf | grep -oP '(?<=>= )\d+\.\d+\.\d+(?=")')
-          echo "tf_version=$TF_VERSION" >> $GITHUB_OUTPUT
-          echo "tf_version=$TF_VERSION"
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: ${{ steps.get_tf_version.outputs.tf_version }}
-
-      - name: Check formatting
-        working-directory: deploy/terraform
-        run: |
-          terraform init -backend=false
-          terraform validate
-          terraform fmt -check -recursive
+        run: npm test 
