@@ -14,15 +14,102 @@ The Meal Manager application is deployed across multiple cloud providers to opti
 
 ## Deployment Process
 
-The deployment process is separated into two main steps:
+This document outlines the deployment process for the Meal Manager application and the required configurations in the GitHub repository.
 
-1. **Build & Push API Docker Image**: Automated via GitHub Actions
-2. **Deploy Infrastructure**: Managed via Terraform
+## Overview
 
-This separation provides several benefits:
-- Secure handling of secrets
-- Clear separation of concerns
-- Ability to roll back container images independently of infrastructure
+The Meal Manager application uses GitHub Actions for continuous integration and deployment. The deployment process is automated and triggered on each commit to the main branch or manually through workflow dispatch.
+
+The application consists of three main components:
+1. **API**: A Spring Boot application deployed to Fly.io using Docker
+2. **Client**: A TypeScript frontend application deployed to Render
+3. **Infrastructure**: Terraform configurations for AWS resources
+
+## Workflow Files
+
+The following GitHub Actions workflow files automate the CI/CD process:
+
+1. **lint.yml**: Runs linters for the API (Java), Client (TypeScript), and Terraform code
+2. **test.yml**: Executes tests for the API and Client code
+3. **deploy.yml**: Handles the deployment of all components when tests pass
+
+## Deployment Flow
+
+1. When code is pushed to the main branch, all three workflows are triggered.
+2. The `lint.yml` workflow checks code quality for each component.
+3. The `test.yml` workflow runs tests for each component.
+4. If tests pass, the `deploy.yml` workflow:
+   - Builds and deploys the API to Fly.io (if API code changes are detected)
+   - Deploys the client to Render (if client code changes are detected)
+   - Applies Terraform configurations to update infrastructure (if Terraform code changes are detected)
+
+## Manual Deployment
+
+You can manually trigger a deployment by:
+1. Going to the "Actions" tab in the GitHub repository
+2. Selecting the "Deploy Application" workflow
+3. Clicking "Run workflow"
+4. Selecting the target environment (dev, test, or prod)
+5. Clicking "Run workflow"
+
+## Repository Settings
+
+The following variables and secrets must be defined in the Repository Settings to enable successful deployments.
+
+### Repository Variables
+
+| Name | Optional/Required | Possible Values | Description |
+| ---- | ----------------- | --------------- | ----------- |
+
+### Repository Secrets
+
+| Name | Optional/Required | Possible Values | Description |
+| ---- | ----------------- | --------------- | ----------- |
+
+
+## Environment-Specific Configuration
+
+For each environment (dev, test, prod), you should configure the following:
+
+### Environment Secrets
+
+| Name | Optional/Required | Possible Values | Description |
+| ---- | ----------------- | --------------- | ----------- |
+| AWS_SECRET_ACCESS_KEY | Required | * | Environment-specific AWS secret access key |
+| FLY_API_TOKEN | Required | * | API token for Fly.io for deploying the API |
+
+### Environment Variables
+
+| Name | Optional/Required | Possible Values | Description |
+| ---- | ----------------- | --------------- | ----------- |
+| AWS_REGION | Required | e.g., us-east-1 | The AWS region where resources will be deployed |
+| AWS_ACCESS_KEY_ID | Required | * | AWS access key ID with permissions for the environment |
+| APP_ENVIRONMENT | Optional | dev, test, prod | Application environment (defaults to "dev") |
+| APP_DEBUG_ENABLED | Optional | true, false | Enable debug mode (defaults to "false") |
+
+## Required Infrastructure
+
+Before deployment can succeed, ensure the following infrastructure is in place:
+
+1. **AWS Account** with appropriate IAM permissions
+2. **Fly.io Account** for API hosting
+3. **Render Account** for client hosting
+4. **PostgreSQL Database** (can be hosted on AWS RDS or another provider)
+5. **AWS SES** configured for email sending
+6. **Clerk Account** for authentication (optional based on implementation)
+
+## Troubleshooting
+
+If deployments fail, check the following:
+
+1. Ensure all required secrets and variables are set correctly in the repository settings
+2. Check the GitHub Actions logs for detailed error messages
+3. Verify that the infrastructure prerequisites are properly configured
+4. Ensure the application code passes all linters and tests
+
+For API-specific issues, refer to the server logs on Fly.io.
+For client-specific issues, check the deployment logs on Render.
+For infrastructure issues, review the Terraform plan output in the GitHub Actions logs.
 
 ## Setting Up GitHub Actions
 
