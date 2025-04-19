@@ -5,6 +5,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ConfigurableApplicationContext;
 
+/**
+ * Application class that handles messaging queue functionality.
+ * Implements CommandLineRunner to execute code after application startup.
+ */
 public class MessagingApplication implements CommandLineRunner {
     @Value("${tutorial.client.duration:0}")
     private int duration;
