@@ -78,7 +78,7 @@ jobs:
           terraform_version: ${{ steps.get_tf_version.outputs.terraform_version }}
 
       - name: Check formatting
-        working-directory: deploy/terraform
+        working-directory: deploy/terraform/manifests/dns
         run: |
           terraform init -backend=false
           terraform validate
