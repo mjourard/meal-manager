@@ -77,7 +77,7 @@ if [ "$SKIP_BUILD" = false ]; then
         exit 1
     fi
     
-    mvn clean package -DskipTests
+    mvn clean package -DskipTests -Denvfile.skip=true
     
     if [ $? -ne 0 ]; then
         log_error "Maven build failed."

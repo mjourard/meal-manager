@@ -93,7 +93,6 @@ jobs:
       
       - name: Run API deployment script
         run: |
-          chmod +x deploy/scripts/fly-deploy.sh
           ./deploy/scripts/fly-deploy.sh
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
