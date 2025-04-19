@@ -12,13 +12,13 @@ on:
         type: environment
 
 jobs:
-  test:
-    name: Run Tests
-    uses: ./.github/workflows/test.yml
+# Disable until we have a test suite
+#   test:
+#     name: Run Tests
+#     uses: ./.github/workflows/test.yml
 
   deploy-api:
     name: Deploy API
-    needs: test
     runs-on: ubuntu-latest
     if: ${{ success() && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.modified, 'api/') || contains(github.event.head_commit.added, 'api/')) }}
     environment: ${{ inputs.environment || 'production' }}
@@ -100,7 +100,6 @@ jobs:
 
   deploy-terraform:
     name: Deploy Infrastructure
-    needs: test
     runs-on: ubuntu-latest
     if: ${{ success() && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.modified, 'deploy/terraform/') || contains(github.event.head_commit.added, 'deploy/terraform/')) }}
     environment: ${{ inputs.environment || 'production' }}
