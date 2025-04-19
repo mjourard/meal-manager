@@ -109,17 +109,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      - name: Read Terraform version
+      - name: Get Terraform version
         id: get_tf_version
-        run: |
-          TF_VERSION=$(grep -A 1 'required_version' deploy/terraform/providers.tf | grep -oP '(?<=>= )\d+\.\d+\.\d+(?=")')
-          echo "tf_version=$TF_VERSION" >> $GITHUB_OUTPUT
-          echo "tf_version=$TF_VERSION"
+        uses: ./.github/actions/get-terraform-version
+        with:
+          manifest_path: deploy/terraform/manifests/dns/providers.tf
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: ${{ steps.get_tf_version.outputs.tf_version }}
+          terraform_version: ${{ steps.get_tf_version.outputs.terraform_version }}
       
       - name: Set environment variables
         run: |

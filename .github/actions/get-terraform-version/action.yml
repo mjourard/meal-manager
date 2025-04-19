@@ -1,0 +1,23 @@
+name: 'Get Terraform Version'
+description: 'Extract Terraform version from manifest file'
+inputs:
+  manifest_path:
+    description: 'Path to the Terraform manifest file containing required_version'
+    required: true
+    default: 'deploy/terraform/manifests/dns/providers.tf'
+
+outputs:
+  terraform_version:
+    description: 'The extracted Terraform version'
+    value: ${{ steps.extract_version.outputs.tf_version }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Extract Terraform version
+      id: extract_version
+      shell: bash
+      run: |
+        TF_VERSION=$(grep -A 1 'required_version' ${{ inputs.manifest_path }} | grep -oP '(?<=>= )\d+\.\d+\.\d+(?=")')
+        echo "tf_version=$TF_VERSION" >> $GITHUB_OUTPUT
+        echo "Extracted Terraform version: $TF_VERSION" 
