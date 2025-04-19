@@ -1,14 +1,12 @@
 package com.mealmanager.api.controller;
 
 import com.mealmanager.api.model.Recipe;
-import com.mealmanager.api.model.SysUser;
 import com.mealmanager.api.repository.RecipeRepository;
 import com.mealmanager.api.repository.SysUserRepository;
 import com.mealmanager.api.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;

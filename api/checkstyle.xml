@@ -55,5 +55,10 @@
             <property name="option" value="TEXT"/>
             <property name="tokens" value="LITERAL_TRY, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_SWITCH"/>
         </module>
+        
+        <!-- Checks for unused imports -->
+        <module name="UnusedImports">
+            <property name="severity" value="warning"/>
+        </module>
     </module>
 </module> 

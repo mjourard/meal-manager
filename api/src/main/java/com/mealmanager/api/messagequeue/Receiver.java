@@ -13,7 +13,6 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
-import java.util.List;
 
 @RabbitListener(queues = "email")
 public class Receiver {
