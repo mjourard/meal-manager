@@ -45,7 +45,11 @@ public class RecipeOrderDetailsDTO {
         return this.message;
     }
 
-    public void setOrderId(long id) { this.orderId = id;}
+    public void setOrderId(long id) { 
+        this.orderId = id;
+    }
 
-    public void setMessage(String message) { this.message = message;}
+    public void setMessage(String message) { 
+        this.message = message;
+    }
 }

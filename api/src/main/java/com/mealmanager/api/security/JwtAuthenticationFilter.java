@@ -72,15 +72,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     log.debug("JWT token found in request");
                 }
                 validateToken(token.get())
-                        .ifPresentOrElse(
-                            jwt -> {
-                                setAuthentication(jwt);
-                                if (debugEnabled) {
-                                    log.debug("Authentication successful for user: {}", jwt.getSubject());
-                                }
-                            },
-                            () -> log.warn("Failed to validate JWT token")
-                        );
+                    .ifPresentOrElse(
+                        jwt -> {
+                            setAuthentication(jwt);
+                            if (debugEnabled) {
+                                log.debug("Authentication successful for user: {}", jwt.getSubject());
+                            }
+                        },
+                        () -> log.warn("Failed to validate JWT token")
+                    );
             }
         } catch (Exception e) {
             log.error("JWT Authentication failed", e);

@@ -34,7 +34,7 @@ public class Receiver {
         }
         SpringTemplateEngine engine = templateService.thymeleafTemplateEngine(templateService.thymeleafTemplateResolver());
         final Context ctx = new Context();
-        for(String dataKey : data.getDataMap().keySet()) {
+        for (String dataKey : data.getDataMap().keySet()) {
             logger.debug(dataKey, data.getDataMap().get(dataKey));
             ctx.setVariable(dataKey, data.getDataMap().get(dataKey));
         }

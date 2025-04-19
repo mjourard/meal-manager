@@ -57,7 +57,9 @@ public class Recipe {
         return this.description;
     }
 
-    public void setRecipeURL(String url) { this.recipeURL = url; }
+    public void setRecipeURL(String url) { 
+        this.recipeURL = url; 
+    }
 
     public String getRecipeURL() {
         return this.recipeURL;

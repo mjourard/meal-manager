@@ -77,14 +77,14 @@ public class RecipeOrderController {
             //save the order and create the data DTO
             GroceryMealOrderData templateData = new GroceryMealOrderData();
             RecipeOrder newOrder = recipeOrderRepository.save(new RecipeOrder(recipeOrder.getMessage()));
-            for(Recipe recipe : recipes) {
+            for (Recipe recipe : recipes) {
                 recipeOrderItemRepository.save(new RecipeOrderItem(newOrder.getId(), recipe.getId()));
                 templateData.addMeal(recipe.getName());
             }
             templateData.setMessage(recipeOrder.getMessage());
 
             EmailTemplateData emailData = new EmailTemplateData();
-            for(SysUser user : users) {
+            for (SysUser user : users) {
                 recipeOrderRecipientRepository.save(new RecipeOrderRecipient(newOrder.getId(), user.getId()));
                 emailData.addTo(List.of(user.getEmail()));
             }
@@ -133,11 +133,11 @@ public class RecipeOrderController {
             RecipeOrder order = orderData.get();
             RecipeOrderDetailsDTO dto = new RecipeOrderDetailsDTO(order.getId());
             List<RecipeOrderItem> orderItems = recipeOrderItemRepository.findByOrderId(order.getId());
-            for(RecipeOrderItem item : orderItems) {
+            for (RecipeOrderItem item : orderItems) {
                 dto.addSelectedRecipe(item.getRecipe());
             }
             List<RecipeOrderRecipient> orderRecipients = recipeOrderRecipientRepository.findByOrderId(order.getId());
-            for(RecipeOrderRecipient user : orderRecipients) {
+            for (RecipeOrderRecipient user : orderRecipients) {
                 dto.addSelectedUser(user.getSysUser());
             }
             if (order.getMessage() != null) {
