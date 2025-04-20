@@ -150,6 +150,7 @@ jobs:
         working-directory: deploy/terraform/manifests/dns
         run: |
           terraform init
-          terraform apply -auto-approve
+          echo "Passed secret: $TF_VAR_render_api_key"
+        #   terraform apply -auto-approve
         env:
           TF_VAR_render_api_key: ${{ secrets.TF_VAR_render_api_key }}
