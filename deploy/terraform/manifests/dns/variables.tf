@@ -5,12 +5,12 @@ variable "aws_region" {
 }
 
 variable "environment" {
-  description = "The deployment environment (dev or prod)"
+  description = "The deployment environment (dev or production)"
   type        = string
-  default     = "prod"
+  default     = "production"
   validation {
-    condition     = contains(["dev", "prod"], var.environment)
-    error_message = "Environment must be either 'dev' or 'prod'."
+    condition     = contains(["dev", "production"], var.environment)
+    error_message = "Environment must be either 'dev' or 'production'."
   }
 }
 
