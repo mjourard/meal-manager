@@ -138,14 +138,13 @@ jobs:
       - name: See deployment user
         run: aws sts get-caller-identity
       
-      - name: Initialize Terraform
-        working-directory: deploy/terraform
-        run: terraform init
+      - name: Setup Terraform environment files
+        uses: ./.github/actions/terraform-env-setup
+        with:
+          environment: ${{ inputs.environment || 'production' }}
       
-      - name: Terraform Plan
-        working-directory: deploy/terraform
-        run: terraform plan -var-file=environments/${{ env.DEPLOY_ENV }}.auto.tfvars -out=tfplan
-      
-      - name: Terraform Apply
-        working-directory: deploy/terraform
-        run: terraform apply tfplan 
+      - name: Apply Terraform
+        working-directory: deploy/terraform/manifests/dns
+        run: |
+          terraform init
+          terraform apply -auto-approve
