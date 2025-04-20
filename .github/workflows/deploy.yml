@@ -102,6 +102,9 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ success() && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.modified, 'deploy/terraform/') || contains(github.event.head_commit.added, 'deploy/terraform/')) }}
     environment: ${{ inputs.environment || 'production' }}
+    permissions:
+      contents: read
+      id-token: write
     
     steps:
       - name: Checkout repository
@@ -148,3 +151,5 @@ jobs:
         run: |
           terraform init
           terraform apply -auto-approve
+        env:
+          TF_VAR_render_api_key: ${{ secrets.TF_VAR_render_api_key }}

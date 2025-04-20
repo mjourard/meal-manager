@@ -32,6 +32,32 @@ deploy/
   uses: ./.github/actions/terraform-env-setup
   with:
     environment: ${{ env.DEPLOY_ENV }}  # or directly: production, dev, etc.
+  env:
+    TF_VAR_render_api_key: ${{ secrets.TF_VAR_render_api_key }}
+    # Add any other sensitive variables here
+```
+
+## Handling Secrets
+
+This action creates a `secrets.auto.tfvars` file that includes sensitive variables from GitHub environment secrets. 
+Any environment variable starting with `TF_VAR_` will be processed by Terraform automatically.
+
+To use secrets in your Terraform configuration:
+
+1. Store your secrets in GitHub environment secrets with the `TF_VAR_` prefix (e.g., `TF_VAR_render_api_key`)
+2. Pass these secrets to the action as environment variables
+3. Reference them in your Terraform code as normal variables (e.g., `render_api_key`)
+
+Example workflow step:
+
+```yaml
+- name: Setup Terraform environment files
+  uses: ./.github/actions/terraform-env-setup
+  with:
+    environment: production
+  env:
+    TF_VAR_render_api_key: ${{ secrets.TF_VAR_render_api_key }}
+    TF_VAR_another_secret: ${{ secrets.TF_VAR_another_secret }}
 ```
 
 ## Inputs

@@ -40,3 +40,5 @@ runs:
         echo "Files in target directory after copy:"
         ls -la "$TARGET_DIR"
         
+        echo "Setup complete!"
+        
