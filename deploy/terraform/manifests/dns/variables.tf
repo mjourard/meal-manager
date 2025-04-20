@@ -5,12 +5,12 @@ variable "aws_region" {
 }
 
 variable "environment" {
-  description = "The deployment environment (dev or prod)"
+  description = "The deployment environment (dev or production)"
   type        = string
-  default     = "prod"
+  default     = "production"
   validation {
-    condition     = contains(["dev", "prod"], var.environment)
-    error_message = "Environment must be either 'dev' or 'prod'."
+    condition     = contains(["dev", "production"], var.environment)
+    error_message = "Environment must be either 'dev' or 'production'."
   }
 }
 
@@ -54,14 +54,14 @@ variable "fly_app_name" {
 
 variable "clerk_config" {
   description = "The Clerk publishable key"
-  type        = object({
-    publishable_key = string
-    cname_clerk = string
-    cname_accounts = string
-    cname_email_clk = string
-    cname_email_clk2 = string
+  type = object({
+    publishable_key     = string
+    cname_clerk         = string
+    cname_accounts      = string
+    cname_email_clk     = string
+    cname_email_clk2    = string
     cname_email_clkmail = string
-    sign_in_url = string
-    sign_up_url = string
+    sign_in_url         = string
+    sign_up_url         = string
   })
 }

@@ -12,13 +12,13 @@ on:
         type: environment
 
 jobs:
-  test:
-    name: Run Tests
-    uses: ./.github/workflows/test.yml
+# Disable until we have a test suite
+#   test:
+#     name: Run Tests
+#     uses: ./.github/workflows/test.yml
 
   deploy-api:
     name: Deploy API
-    needs: test
     runs-on: ubuntu-latest
     if: ${{ success() && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.modified, 'api/') || contains(github.event.head_commit.added, 'api/')) }}
     environment: ${{ inputs.environment || 'production' }}
@@ -93,33 +93,33 @@ jobs:
       
       - name: Run API deployment script
         run: |
-          chmod +x deploy/scripts/fly-deploy.sh
           ./deploy/scripts/fly-deploy.sh
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
   deploy-terraform:
     name: Deploy Infrastructure
-    needs: test
     runs-on: ubuntu-latest
     if: ${{ success() && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.modified, 'deploy/terraform/') || contains(github.event.head_commit.added, 'deploy/terraform/')) }}
     environment: ${{ inputs.environment || 'production' }}
+    permissions:
+      contents: read
+      id-token: write
     
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      - name: Read Terraform version
+      - name: Get Terraform version
         id: get_tf_version
-        run: |
-          TF_VERSION=$(grep -A 1 'required_version' deploy/terraform/providers.tf | grep -oP '(?<=>= )\d+\.\d+\.\d+(?=")')
-          echo "tf_version=$TF_VERSION" >> $GITHUB_OUTPUT
-          echo "tf_version=$TF_VERSION"
+        uses: ./.github/actions/get-terraform-version
+        with:
+          manifest_path: deploy/terraform/manifests/dns/providers.tf
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: ${{ steps.get_tf_version.outputs.tf_version }}
+          terraform_version: ${{ steps.get_tf_version.outputs.terraform_version }}
       
       - name: Set environment variables
         run: |
@@ -141,14 +141,16 @@ jobs:
       - name: See deployment user
         run: aws sts get-caller-identity
       
-      - name: Initialize Terraform
-        working-directory: deploy/terraform
-        run: terraform init
+      - name: Setup Terraform environment files
+        uses: ./.github/actions/terraform-env-setup
+        with:
+          environment: ${{ inputs.environment || 'production' }}
       
-      - name: Terraform Plan
-        working-directory: deploy/terraform
-        run: terraform plan -var-file=environments/${{ env.DEPLOY_ENV }}.auto.tfvars -out=tfplan
-      
-      - name: Terraform Apply
-        working-directory: deploy/terraform
-        run: terraform apply tfplan 
+      - name: Apply Terraform
+        working-directory: deploy/terraform/manifests/dns
+        run: |
+          terraform init
+          echo "Passed secret: $TF_VAR_render_api_key"
+          terraform apply -auto-approve
+        env:
+          TF_VAR_render_api_key: ${{ secrets.TF_VAR_render_api_key }}

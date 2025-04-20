@@ -1,6 +1,11 @@
 package com.mealmanager.api.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "recipe")
@@ -52,7 +57,9 @@ public class Recipe {
         return this.description;
     }
 
-    public void setRecipeURL(String url) { this.recipeURL = url; }
+    public void setRecipeURL(String url) { 
+        this.recipeURL = url; 
+    }
 
     public String getRecipeURL() {
         return this.recipeURL;

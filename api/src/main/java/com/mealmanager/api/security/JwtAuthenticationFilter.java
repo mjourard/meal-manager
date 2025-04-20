@@ -1,17 +1,15 @@
 package com.mealmanager.api.security;
 
-import com.auth0.jwk.Jwk;
-import com.auth0.jwk.JwkProvider;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.auth0.jwt.interfaces.Verification;
-import com.mealmanager.api.config.JwtConfig;
+import java.io.IOException;
+import java.security.interfaces.RSAPublicKey;
+import java.util.Collections;
+import java.util.Optional;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,11 +19,19 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-import java.security.interfaces.RSAPublicKey;
-import java.util.Collections;
-import java.util.Optional;
+import com.auth0.jwk.Jwk;
+import com.auth0.jwk.JwkProvider;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.auth0.jwt.interfaces.Verification;
+import com.mealmanager.api.config.JwtConfig;
 
+/**
+ * Filter that handles JWT authentication for the API.
+ * Validates the JWT token from the Authorization header and sets up Spring Security context.
+ */
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
@@ -36,6 +42,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtConfig jwtConfig;
     private final boolean debugEnabled;
 
+    /**
+     * Creates a new JWT authentication filter.
+     *
+     * @param jwkProvider The JWK provider for key verification
+     * @param jwtConfig The JWT configuration
+     * @param debugEnabled Whether debug mode is enabled
+     */
     public JwtAuthenticationFilter(
             JwkProvider jwkProvider, 
             JwtConfig jwtConfig,
@@ -59,15 +72,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     log.debug("JWT token found in request");
                 }
                 validateToken(token.get())
-                        .ifPresentOrElse(
-                            jwt -> {
-                                setAuthentication(jwt);
-                                if (debugEnabled) {
-                                    log.debug("Authentication successful for user: {}", jwt.getSubject());
-                                }
-                            },
-                            () -> log.warn("Failed to validate JWT token")
-                        );
+                    .ifPresentOrElse(
+                        jwt -> {
+                            setAuthentication(jwt);
+                            if (debugEnabled) {
+                                log.debug("Authentication successful for user: {}", jwt.getSubject());
+                            }
+                        },
+                        () -> log.warn("Failed to validate JWT token")
+                    );
             }
         } catch (Exception e) {
             log.error("JWT Authentication failed", e);
@@ -76,6 +89,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * Extracts the JWT token from the request's Authorization header.
+     *
+     * @param request The HTTP request
+     * @return An Optional containing the JWT token if present
+     */
     private Optional<String> getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
         if (bearerToken != null && bearerToken.startsWith(BEARER_PREFIX)) {
@@ -84,6 +103,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return Optional.empty();
     }
 
+    /**
+     * Validates the JWT token against the configured issuer and audience.
+     *
+     * @param token The JWT token to validate
+     * @return An Optional containing the decoded JWT if valid
+     */
     private Optional<DecodedJWT> validateToken(String token) {
         try {
             // Only decode and log token details if debug is enabled
@@ -156,6 +181,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * Sets up the Spring Security authentication context with the validated JWT.
+     *
+     * @param jwt The validated JWT token
+     */
     private void setAuthentication(DecodedJWT jwt) {
         String userId = jwt.getSubject();
         

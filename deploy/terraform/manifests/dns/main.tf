@@ -51,7 +51,7 @@ resource "aws_route53_record" "api" {
   type    = "CNAME"
   ttl     = 300
   records = ["${var.fly_app_name}.fly.dev"]
-} 
+}
 
 # DNS records for Clerk authentication
 resource "aws_route53_record" "clerk_main" {

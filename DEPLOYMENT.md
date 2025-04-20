@@ -77,6 +77,7 @@ For each environment (dev, test, prod), you should configure the following:
 | ---- | ----------------- | --------------- | ----------- |
 | AWS_SECRET_ACCESS_KEY | Required | * | Environment-specific AWS secret access key |
 | FLY_API_TOKEN | Required | * | API token for Fly.io for deploying the API |
+| TF_VAR_render_api_key | Required | * | The API key for render used to setup the DNS with it. |
 
 ### Environment Variables
 

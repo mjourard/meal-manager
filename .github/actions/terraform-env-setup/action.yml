@@ -1,0 +1,44 @@
+name: 'Terraform Environment Setup'
+description: 'Copies environment-specific Terraform variable files to the manifest directory'
+inputs:
+  environment:
+    description: 'The deployment environment (dev, test, production, etc.)'
+    required: true
+  source_dir:
+    description: 'The source directory containing environment-specific files'
+    required: false
+    default: 'deploy/terraform/environments'
+  target_dir:
+    description: 'The target manifest directory'
+    required: false
+    default: 'deploy/terraform/manifests/dns'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Validate environment directory
+      shell: bash
+      run: |
+        ENV_DIR="${{ inputs.source_dir }}/${{ inputs.environment }}"
+        if [ ! -d "$ENV_DIR" ]; then
+          echo "::error::Environment directory does not exist: $ENV_DIR"
+          exit 1
+        fi
+        echo "Using environment directory: $ENV_DIR"
+    
+    - name: Copy Terraform variable files
+      shell: bash
+      run: |
+        SOURCE_DIR="${{ inputs.source_dir }}/${{ inputs.environment }}"
+        TARGET_DIR="${{ inputs.target_dir }}"
+        FILE_PATTERN="env.auto.tfvars"
+        
+        echo "Copying $FILE_COUNT file(s) from $SOURCE_DIR to $TARGET_DIR"
+        cp -v "$SOURCE_DIR"/$FILE_PATTERN "$TARGET_DIR"/
+        
+        # List files in target directory for verification
+        echo "Files in target directory after copy:"
+        ls -la "$TARGET_DIR"
+        
+        echo "Setup complete!"
+        

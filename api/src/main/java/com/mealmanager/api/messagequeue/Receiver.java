@@ -13,7 +13,6 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
-import java.util.List;
 
 @RabbitListener(queues = "email")
 public class Receiver {
@@ -34,7 +33,7 @@ public class Receiver {
         }
         SpringTemplateEngine engine = templateService.thymeleafTemplateEngine(templateService.thymeleafTemplateResolver());
         final Context ctx = new Context();
-        for(String dataKey : data.getDataMap().keySet()) {
+        for (String dataKey : data.getDataMap().keySet()) {
             logger.debug(dataKey, data.getDataMap().get(dataKey));
             ctx.setVariable(dataKey, data.getDataMap().get(dataKey));
         }

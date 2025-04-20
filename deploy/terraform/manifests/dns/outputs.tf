@@ -5,7 +5,7 @@ output "frontend_url" {
 }
 
 output "render_site" {
-  value     = render_static_site.frontend.custom_domains.*
+  value = render_static_site.frontend.custom_domains.*
 }
 
 output "api_url" {
