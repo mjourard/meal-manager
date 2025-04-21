@@ -22,7 +22,7 @@ java -version
 
 Set the environment variables from the `.env` file in the directory above:
 ```
-pushd ../env-files && set -a && source local.api.env && set +a && popd
+pushd ../env-files && set -a && source dev.api.env && set +a && popd
 ```
 
 ## Running the Application

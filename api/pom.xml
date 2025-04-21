@@ -16,11 +16,12 @@
     <description>Meal Manager In Spring Boot</description>
     <properties>
         <java.version>11</java.version>
-        <envFileDirectory>../env-files</envFileDirectory>
         <version.software.amazon.awssdk>2.15.0</version.software.amazon.awssdk>
         <version.com.h2database.h2>1.4.200</version.com.h2database.h2>
         <version.org.junit.jupiter>5.4.2</version.org.junit.jupiter>
         <version.org.testcontainers>1.15.3</version.org.testcontainers>
+        <envfile.envFileName>.env</envfile.envFileName>
+        <envFileDirectory>../env-files</envFileDirectory>
         <envfile.skip>false</envfile.skip>
         <app.version>${project.version}</app.version>
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
@@ -165,6 +166,7 @@
                         </goals>
                         <configuration>
                             <skip>${envfile.skip}</skip>
+                            <envFileName>${envfile.envFileName}</envFileName>
                         </configuration>
                     </execution>
                 </executions>
@@ -199,5 +201,14 @@
             </resource>
         </resources>
     </build>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <envfile.envFileName>dev.api.env</envfile.envFileName>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>
