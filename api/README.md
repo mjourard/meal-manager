@@ -1,7 +1,6 @@
 # Meal Manager API
 
 This is an API written using Java's Spring Boot to power the Meal Manager web app. 
-It's never been launched to prod, but here's how I got it working in dev future Matt.
 
 ## Development Setup
 
@@ -20,10 +19,8 @@ java -version
 
 ### Environment Variables
 
-Set the environment variables from the `.env` file in the directory above:
-```
-pushd ../env-files && set -a && source dev.api.env && set +a && popd
-```
+These are managed locally by the env-file-maven-plugin, as long as you specify the appropriate file on startup. 
+For local development, that would be `-Pdev`
 
 ## Running the Application
 
@@ -33,12 +30,12 @@ Development mode enables debug features and verbose logging, which is useful for
 
 ```bash
 # Using Maven with profile flag
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev -Pdev
 
 # Using environment variables
 export APP_ENVIRONMENT=dev
 export APP_DEBUG_ENABLED=true
-./mvnw spring-boot:run
+./mvnw spring-boot:run -Pdev
 ```
 
 In development mode:
