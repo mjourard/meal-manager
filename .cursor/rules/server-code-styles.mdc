@@ -7,4 +7,4 @@ alwaysApply: false
 # Your rule content
 
 - all code changes should adhere to the checkstyle rules as defined in [checkstyle.xml](mdc:api/checkstyle.xml)
-- You can use markdown but dont have to
+- when adding new dependencies, get the latest version that is compatible with the target java version. The target java version can be found in api/pom.xml in the element called "java.version" in the properties section.

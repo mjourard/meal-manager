@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 public class Sender {
 
@@ -15,6 +16,7 @@ public class Sender {
     private RabbitTemplate template;
 
     @Autowired
+    @Qualifier("emailQueue")
     private Queue queue;
 
     public void send(EmailTemplateData data) {
