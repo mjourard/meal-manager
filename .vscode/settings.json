@@ -4,5 +4,11 @@
         "editor.tabSize": 2,
         "editor.insertSpaces": true
     },
+    "[java]": {
+        "editor.suggest.snippetsPreventQuickSuggestions": false,
+        "editor.formatOnSave": false,
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4
+    },
     "java.configuration.updateBuildConfiguration": "disabled"
 }

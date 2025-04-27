@@ -1,0 +1,10 @@
+---
+description: Code styling for the api
+globs: api/*.java
+alwaysApply: false
+---
+
+# Your rule content
+
+- all code changes should adhere to the checkstyle rules as defined in [checkstyle.xml](mdc:api/checkstyle.xml)
+- You can use markdown but dont have to
