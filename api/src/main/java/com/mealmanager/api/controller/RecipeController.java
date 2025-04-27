@@ -16,8 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -76,12 +76,11 @@ public class RecipeController {
             }
 
             // Extract content and create response
-            Map<String, Object> response = Map.of(
-                "recipes", recipePage.getContent(),
-                "currentPage", recipePage.getNumber(),
-                "totalItems", recipePage.getTotalElements(),
-                "totalPages", recipePage.getTotalPages()
-            );
+            Map<String, Object> response = new HashMap<>();
+            response.put("recipes", recipePage.getContent());
+            response.put("currentPage", recipePage.getNumber());
+            response.put("totalItems", recipePage.getTotalElements());
+            response.put("totalPages", recipePage.getTotalPages());
 
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
@@ -115,7 +114,7 @@ public class RecipeController {
                 Recipe recipe = recipeData.get();
                 
                 // Check if the recipe is private and the current user is not the owner
-                if (recipe.isPrivate() && !recipe.getOwner().getId().equals(currentUser.getId())) {
+                if (recipe.isPrivate() && (recipe.getOwner() == null || recipe.getOwner().getId() != currentUser.getId())) {
                     return new ResponseEntity<>(HttpStatus.FORBIDDEN);
                 }
                 
@@ -148,20 +147,12 @@ public class RecipeController {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
-            // Set owner and timestamps
+            // Set owner
             recipe.setOwner(currentUser);
-            LocalDateTime now = LocalDateTime.now();
-            recipe.setCreatedAt(now);
-            recipe.setUpdatedAt(now);
             
-            // Set defaults if not provided
-            if (recipe.isDisabled() == null) {
-                recipe.setDisabled(false);
-            }
-            
-            if (recipe.isPrivate() == null) {
-                recipe.setPrivate(false);
-            }
+            // Set defaults
+            // Since disabled is a primitive boolean, it defaults to false already
+            // No need for null check
 
             Recipe savedRecipe = recipeRepository.save(recipe);
             return new ResponseEntity<>(savedRecipe, HttpStatus.CREATED);
@@ -200,13 +191,13 @@ public class RecipeController {
                 Recipe existingRecipe = recipeData.get();
                 
                 // Check if the current user is the owner
-                if (!existingRecipe.getOwner().getId().equals(currentUser.getId())) {
+                if (existingRecipe.getOwner() == null || existingRecipe.getOwner().getId() != currentUser.getId()) {
                     return new ResponseEntity<>(HttpStatus.FORBIDDEN);
                 }
                 
                 // Update fields
-                if (recipe.getTitle() != null) {
-                    existingRecipe.setTitle(recipe.getTitle());
+                if (recipe.getName() != null) {
+                    existingRecipe.setName(recipe.getName());
                 }
                 
                 if (recipe.getDescription() != null) {
@@ -217,8 +208,8 @@ public class RecipeController {
                     existingRecipe.setInstructions(recipe.getInstructions());
                 }
                 
-                if (recipe.getServings() != null) {
-                    existingRecipe.setServings(recipe.getServings());
+                if (recipe.getPortionCount() != null) {
+                    existingRecipe.setPortionCount(recipe.getPortionCount());
                 }
                 
                 if (recipe.getPrepTimeMinutes() != null) {
@@ -229,36 +220,17 @@ public class RecipeController {
                     existingRecipe.setCookTimeMinutes(recipe.getCookTimeMinutes());
                 }
                 
-                if (recipe.isVegetarian() != null) {
-                    existingRecipe.setVegetarian(recipe.isVegetarian());
-                }
+                // These are booleans, not Booleans, so no null check needed
+                existingRecipe.setVegetarian(recipe.isVegetarian());
+                existingRecipe.setVegan(recipe.isVegan());
+                existingRecipe.setDairyFree(recipe.isDairyFree());
+                existingRecipe.setNutFree(recipe.isNutFree());
+                existingRecipe.setPrivate(recipe.isPrivate());
+                existingRecipe.setDisabled(recipe.getDisabled());
                 
-                if (recipe.isVegan() != null) {
-                    existingRecipe.setVegan(recipe.isVegan());
+                if (recipe.getIngredients() != null) {
+                    existingRecipe.setIngredients(recipe.getIngredients());
                 }
-                
-                if (recipe.isDairyFree() != null) {
-                    existingRecipe.setDairyFree(recipe.isDairyFree());
-                }
-                
-                if (recipe.isNutFree() != null) {
-                    existingRecipe.setNutFree(recipe.isNutFree());
-                }
-                
-                if (recipe.isPrivate() != null) {
-                    existingRecipe.setPrivate(recipe.isPrivate());
-                }
-                
-                if (recipe.isDisabled() != null) {
-                    existingRecipe.setDisabled(recipe.isDisabled());
-                }
-                
-                if (recipe.getRecipeIngredients() != null) {
-                    existingRecipe.setRecipeIngredients(recipe.getRecipeIngredients());
-                }
-                
-                // Update timestamp
-                existingRecipe.setUpdatedAt(LocalDateTime.now());
                 
                 return new ResponseEntity<>(recipeRepository.save(existingRecipe), HttpStatus.OK);
             } else {
@@ -295,7 +267,7 @@ public class RecipeController {
                 Recipe recipe = recipeData.get();
                 
                 // Check if the current user is the owner
-                if (!recipe.getOwner().getId().equals(currentUser.getId())) {
+                if (recipe.getOwner() == null || recipe.getOwner().getId() != currentUser.getId()) {
                     return new ResponseEntity<>(HttpStatus.FORBIDDEN);
                 }
                 
@@ -444,7 +416,7 @@ public class RecipeController {
             // Filter recipes to include only user's own recipes and public recipes
             List<Recipe> filteredRecipes = new ArrayList<>();
             for (Recipe recipe : recipes) {
-                if (!recipe.isPrivate() || recipe.getOwner().getId().equals(currentUser.getId())) {
+                if (!recipe.isPrivate() || (recipe.getOwner() != null && recipe.getOwner().getId() == currentUser.getId())) {
                     filteredRecipes.add(recipe);
                 }
             }

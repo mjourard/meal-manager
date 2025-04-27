@@ -19,7 +19,7 @@ public interface CrawlerJobRepository extends JpaRepository<CrawlerJob, Long> {
     
     Page<CrawlerJob> findByUserAndStatus(SysUser user, CrawlerJob.Status status, Pageable pageable);
     
-    Page<CrawlerJob> findByUserAndIsArchived(SysUser user, boolean isArchived, Pageable pageable);
+    Page<CrawlerJob> findByUserAndArchived(SysUser user, boolean archived, Pageable pageable);
     
     @Query("SELECT cj FROM CrawlerJob cj WHERE cj.user = :user AND cj.createdAt >= :since")
     List<CrawlerJob> findRecentByUser(@Param("user") SysUser user, @Param("since") LocalDateTime since);

@@ -77,6 +77,27 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     List<Recipe> findByOwnerAndIsPrivate(SysUser owner, Boolean isPrivate);
     
     /**
+     * Finds recipes belonging to the specified owner or public recipes.
+     *
+     * @param owner The recipe owner
+     * @param pageable Pagination information
+     * @return A page of recipes owned by the specified user or public recipes
+     */
+    @Query("SELECT r FROM Recipe r WHERE r.owner = :owner OR r.isPrivate = false")
+    Page<Recipe> findByOwnerOrPublic(@Param("owner") SysUser owner, Pageable pageable);
+    
+    /**
+     * Finds recipes by name containing the provided string, belonging to the specified owner or public.
+     *
+     * @param owner The recipe owner
+     * @param name The name substring to search for
+     * @param pageable Pagination information
+     * @return A page of recipes owned by the specified user or public recipes matching the name
+     */
+    @Query("SELECT r FROM Recipe r WHERE (r.owner = :owner OR r.isPrivate = false) AND LOWER(r.name) LIKE LOWER(CONCAT('%', :name, '%'))")
+    Page<Recipe> findByOwnerOrPublic(@Param("owner") SysUser owner, @Param("name") String name, Pageable pageable);
+    
+    /**
      * Finds recipes by dietary preferences.
      *
      * @param isVegetarian Whether recipes should be vegetarian
