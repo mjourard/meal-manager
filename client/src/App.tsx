@@ -23,6 +23,8 @@ import DisplayUsers from "./components/pages/display-users.component";
 import EditUser from "./components/pages/edit-user.component";
 import ContactUs from "./components/pages/contact-us.component";
 import BuildInfoPage from "./components/pages/build-info.component";
+import CrawlerJobDetails from "./components/pages/crawler-job-details.component";
+import DisplayCrawlerJobs from "./components/pages/display-crawler-jobs.component";
 
 function App() {
   return (
@@ -54,6 +56,18 @@ function App() {
                 <Link to={"/orders"} className={"nav-link"}>
                   Orders
                 </Link>
+              </li>
+              <li className="nav-item dropdown">
+                <a className="nav-link dropdown-toggle" href="#" id="jobsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Jobs
+                </a>
+                <ul className="dropdown-menu" aria-labelledby="jobsDropdown">
+                  <li>
+                    <Link to="/crawler-jobs" className="dropdown-item">
+                      Crawler Jobs
+                    </Link>
+                  </li>
+                </ul>
               </li>
               <li className={"nav-item"}>
                 <Link to={"/users"} className={"nav-link"}>
@@ -109,6 +123,8 @@ function App() {
             <Route path="/orders/:id" element={<RequireAuth><EditOrder /></RequireAuth>} />
             <Route path="/users" element={<RequireAuth><DisplayUsers /></RequireAuth>} />
             <Route path="/users/:id" element={<RequireAuth><EditUser /></RequireAuth>} />
+            <Route path="/crawler-jobs" element={<RequireAuth><DisplayCrawlerJobs /></RequireAuth>} />
+            <Route path="/crawler-jobs/:id" element={<RequireAuth><CrawlerJobDetails /></RequireAuth>} />
           </Routes>
         </div>
       </Router>

@@ -200,9 +200,14 @@ const AddRecipe: React.FC = () => {
               Add Another
             </button>
             {jobCreated && jobId && (
-              <button className="btn btn-info ms-2" onClick={viewJobDetails}>
-                View Job Details
-              </button>
+              <>
+                <button className="btn btn-info ms-2" onClick={viewJobDetails}>
+                  View Job Details
+                </button>
+                <button className="btn btn-secondary ms-2" onClick={() => navigate('/crawler-jobs')}>
+                  View All Jobs
+                </button>
+              </>
             )}
             <button 
               className="btn btn-primary ms-2" 

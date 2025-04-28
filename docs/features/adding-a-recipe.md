@@ -279,6 +279,7 @@ The crawler job will:
   - Toggle to show/hide archived jobs
   - Action buttons (pause, cancel, restart) for applicable jobs
   - Link to view crawled content
+- add a top-nav dropdown called 'Jobs' and add a single link to the dropdown to 'crawlers'
 
 #### 3.5 Notifications
 - Implement notification system:
