@@ -1,11 +1,21 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCrawlerJobsService, CrawlerJobResponse } from '../../services/crawler-jobs.service';
 
+/**
+ * CrawlerJobDetails component shows the details of a specific crawler job.
+ * 
+ * Implementation notes:
+ * - Uses refs to track if job details have been loaded to prevent continuous API calls
+ * - Stabilizes service reference with useRef to prevent re-creation
+ * - Only refreshes data when actions are performed
+ */
 const CrawlerJobDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const crawlerJobsService = useCrawlerJobsService();
+  
+  // Use a ref to stabilize the service reference
+  const crawlerJobsServiceRef = useRef(useCrawlerJobsService());
   
   const [job, setJob] = useState<CrawlerJobResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -13,22 +23,44 @@ const CrawlerJobDetails: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [performingAction, setPerformingAction] = useState<boolean>(false);
   
+  // Refs to prevent unnecessary API calls
+  const jobLoaded = useRef(false);
+  const requestInProgress = useRef(false);
+  const isMounted = useRef(false);
+  
   const fetchJobDetails = useCallback(async () => {
     if (!id) return;
+    
+    // Skip if already loaded or request in progress
+    if (jobLoaded.current || requestInProgress.current || !isMounted.current) return;
+    
+    // Set flag to avoid concurrent requests
+    requestInProgress.current = true;
     
     try {
       setLoading(true);
       setError(null);
       
-      const jobData = await crawlerJobsService.getCrawlerJob(parseInt(id));
-      setJob(jobData);
+      const jobData = await crawlerJobsServiceRef.current.getCrawlerJob(parseInt(id));
+      
+      // Only update state if component is still mounted
+      if (isMounted.current) {
+        setJob(jobData);
+        jobLoaded.current = true;
+      }
     } catch (error) {
       console.error('Error fetching job details:', error);
-      setError(`Failed to load job details: ${error instanceof Error ? error.message : String(error)}`);
+      if (isMounted.current) {
+        setError(`Failed to load job details: ${error instanceof Error ? error.message : String(error)}`);
+        jobLoaded.current = true;
+      }
     } finally {
-      setLoading(false);
+      if (isMounted.current) {
+        setLoading(false);
+      }
+      requestInProgress.current = false;
     }
-  }, [id, crawlerJobsService]);
+  }, [id]);
 
   const handlePerformAction = async (actionType: 'retry' | 'archive') => {
     if (!id) return;
@@ -38,10 +70,12 @@ const CrawlerJobDetails: React.FC = () => {
       setMessage(null);
       setError(null);
       
-      await crawlerJobsService.performAction(parseInt(id), actionType);
+      await crawlerJobsServiceRef.current.performAction(parseInt(id), actionType);
       
-      // Refresh job data after action
+      // Reset loaded flag to trigger a reload
+      jobLoaded.current = false;
       await fetchJobDetails();
+      
       setMessage(`Action "${actionType}" performed successfully`);
     } catch (error) {
       setError(`Failed to perform action: ${error instanceof Error ? error.message : String(error)}`);
@@ -51,7 +85,16 @@ const CrawlerJobDetails: React.FC = () => {
   };
 
   useEffect(() => {
+    // Set mounted flag
+    isMounted.current = true;
+    
+    // Call fetchJobDetails once
     fetchJobDetails();
+    
+    // Cleanup: reset mounted flag
+    return () => {
+      isMounted.current = false;
+    };
   }, [fetchJobDetails]);
 
   const formatDate = (dateString: string | null): string => {
@@ -59,7 +102,7 @@ const CrawlerJobDetails: React.FC = () => {
     return new Date(dateString).toLocaleString();
   };
 
-  if (loading) {
+  if (loading && !jobLoaded.current) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '300px' }}>
         <div className="spinner-border text-primary" role="status">
@@ -121,6 +164,12 @@ const CrawlerJobDetails: React.FC = () => {
       {error && (
         <div className="alert alert-danger" role="alert">
           {error}
+        </div>
+      )}
+      
+      {loading && jobLoaded.current && (
+        <div className="alert alert-info" role="alert">
+          Refreshing job data...
         </div>
       )}
       
