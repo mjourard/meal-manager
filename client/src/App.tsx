@@ -108,7 +108,7 @@ function App() {
             <Route path="/orders" element={<RequireAuth><DisplayOrders /></RequireAuth>} />
             <Route path="/orders/:id" element={<RequireAuth><EditOrder /></RequireAuth>} />
             <Route path="/users" element={<RequireAuth><DisplayUsers /></RequireAuth>} />
-            <Route path="/myusers/:id" element={<RequireAuth><EditUser /></RequireAuth>} />
+            <Route path="/users/:id" element={<RequireAuth><EditUser /></RequireAuth>} />
           </Routes>
         </div>
       </Router>

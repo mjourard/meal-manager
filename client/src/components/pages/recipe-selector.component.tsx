@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useRecipesService } from '../../services/recipes.service';
 import { Recipe } from '../../models/recipe';
@@ -10,22 +10,22 @@ const RecipeSelector: React.FC = () => {
   const [searchName, setSearchName] = useState<string>('');
   const recipesService = useRecipesService();
 
-  useEffect(() => {
-    retrieveRecipes();
-  }, [recipesService]);
-
-  const onChangeSearchName = (e: ChangeEvent<HTMLInputElement>) => {
-    const searchName = e.target.value;
-    setSearchName(searchName);
-  };
-
-  const retrieveRecipes = async () => {
+  const retrieveRecipes = useCallback(async () => {
     try {
       const data = await recipesService.getAll();
       setRecipes(data);
     } catch (error) {
       console.error('Error retrieving recipes:', error);
     }
+  }, [recipesService]);
+
+  useEffect(() => {
+    retrieveRecipes();
+  }, [retrieveRecipes]);
+
+  const onChangeSearchName = (e: ChangeEvent<HTMLInputElement>) => {
+    const searchName = e.target.value;
+    setSearchName(searchName);
   };
 
   const refreshList = () => {

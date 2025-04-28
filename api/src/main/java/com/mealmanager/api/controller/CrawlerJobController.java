@@ -64,11 +64,13 @@ public class CrawlerJobController {
         
         try {
             if (!securityUtils.isAuthenticated()) {
+                logger.debug("getCrawlerJobs - User not authenticated, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
             
             SysUser currentUser = securityUtils.getCurrentUser();
             if (currentUser == null) {
+                logger.debug("getCrawlerJobs - Cannot find SysUser record for authenticated user, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
             
@@ -102,11 +104,13 @@ public class CrawlerJobController {
     public ResponseEntity<CrawlerJobResponse> getCrawlerJob(@PathVariable("id") long id) {
         try {
             if (!securityUtils.isAuthenticated()) {
+                logger.debug("getCrawlerJob - User not authenticated, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
             
             SysUser currentUser = securityUtils.getCurrentUser();
             if (currentUser == null) {
+                logger.debug("getCrawlerJob - Cannot find SysUser record for authenticated user, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
             
@@ -140,11 +144,13 @@ public class CrawlerJobController {
     public ResponseEntity<CrawlerJobResponse> createCrawlerJob(@RequestBody CrawlerJobCreateRequest request) {
         try {
             if (!securityUtils.isAuthenticated()) {
+                logger.debug("createCrawlerJob - User not authenticated, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
             
             SysUser currentUser = securityUtils.getCurrentUser();
             if (currentUser == null) {
+                logger.debug("createCrawlerJob - Cannot find SysUser record for authenticated user, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
             
@@ -201,11 +207,13 @@ public class CrawlerJobController {
         
         try {
             if (!securityUtils.isAuthenticated()) {
+                logger.debug("performCrawlerJobAction - User not authenticated, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
             
             SysUser currentUser = securityUtils.getCurrentUser();
             if (currentUser == null) {
+                logger.debug("performCrawlerJobAction - Cannot find SysUser record for authenticated user, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
             

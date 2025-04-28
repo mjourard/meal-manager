@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecipesService } from '../../services/recipes.service';
 import { useSysUsersService } from '../../services/sys-users.service';
@@ -33,8 +33,8 @@ const CreateOrder: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [searchRecipe, setSearchRecipe] = useState<string>('');
   
-  // Create a data loading function outside of useEffect to avoid dependencies
-  const loadData = async () => {
+  // Create a data loading function with useCallback to avoid recreating on every render
+  const loadData = useCallback(async () => {
     const sessionId = Date.now().toString();
     
     logger.info(`Fetching initial data for order creation [Session: ${sessionId}]`, COMPONENT_NAME);
@@ -69,17 +69,12 @@ const CreateOrder: React.FC = () => {
       setLoading(false);
       logger.info(`Initial data loading completed ${error ? 'with errors' : 'successfully'}`, COMPONENT_NAME);
     }
-  };
+  }, [recipesService, usersService, logger]);
   
   // Fetch recipes and users on component mount
   useEffect(() => {
-    // Only load data once when the component mounts
     loadData();
-    
-    // Intentionally omitting loadData from dependencies as it's designed to be called only once on mount.
-    // This avoids re-fetching when service hooks change references.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loadData]);
   
   const handleRecipeToggle = (recipeId: number) => {
     setSelectedRecipeIds(prevSelected => {
@@ -148,9 +143,7 @@ const CreateOrder: React.FC = () => {
         COMPONENT_NAME
       );
     }
-  // Remove logger from dependency array to prevent re-renders
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchRecipe, filteredRecipes.length, recipes.length]);
+  }, [searchRecipe, filteredRecipes.length, recipes.length, logger]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -252,9 +245,7 @@ const CreateOrder: React.FC = () => {
     return () => {
       logger.info('CreateOrder component unmounting', COMPONENT_NAME);
     };
-  // This useEffect uses logger but only needs to run once on mount/unmount
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [logger]);
   
   if (loading) {
     return (

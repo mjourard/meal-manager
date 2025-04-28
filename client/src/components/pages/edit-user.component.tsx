@@ -63,8 +63,10 @@ const EditUser: React.FC = () => {
       if (isNewUser) {
         await sysUsersService.create(currentUser);
         setMessage('User was created successfully!');
-        // Optionally navigate back to users list after creation
-        // navigate('/users');
+        // Navigate back to users list after successful creation
+        setTimeout(() => {
+          navigate('/users');
+        }, 1500);
       } else {
         await sysUsersService.update(currentUser.id, currentUser);
         setMessage('The user was updated successfully!');

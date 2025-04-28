@@ -56,11 +56,13 @@ public class RecipeController {
         try {
             // Check if user is authenticated
             if (!securityUtils.isAuthenticated()) {
+                logger.debug("getAllRecipes - User not authenticated, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
             SysUser currentUser = securityUtils.getCurrentUser();
             if (currentUser == null) {
+                logger.debug("getAllRecipes - Cannot find SysUser record for authenticated user, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
@@ -100,11 +102,13 @@ public class RecipeController {
         try {
             // Check if user is authenticated
             if (!securityUtils.isAuthenticated()) {
+                logger.debug("getRecipeById - User not authenticated, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
             SysUser currentUser = securityUtils.getCurrentUser();
             if (currentUser == null) {
+                logger.debug("getRecipeById - Cannot find SysUser record for authenticated user, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
@@ -139,11 +143,13 @@ public class RecipeController {
         try {
             // Check if user is authenticated
             if (!securityUtils.isAuthenticated()) {
+                logger.debug("createRecipe - User not authenticated, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
             SysUser currentUser = securityUtils.getCurrentUser();
             if (currentUser == null) {
+                logger.debug("createRecipe - Cannot find SysUser record for authenticated user, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
@@ -177,11 +183,13 @@ public class RecipeController {
         try {
             // Check if user is authenticated
             if (!securityUtils.isAuthenticated()) {
+                logger.debug("updateRecipe - User not authenticated, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
             SysUser currentUser = securityUtils.getCurrentUser();
             if (currentUser == null) {
+                logger.debug("updateRecipe - Cannot find SysUser record for authenticated user, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
@@ -253,11 +261,13 @@ public class RecipeController {
         try {
             // Check if user is authenticated
             if (!securityUtils.isAuthenticated()) {
+                logger.debug("deleteRecipe - User not authenticated, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
             SysUser currentUser = securityUtils.getCurrentUser();
             if (currentUser == null) {
+                logger.debug("deleteRecipe - Cannot find SysUser record for authenticated user, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
@@ -292,11 +302,13 @@ public class RecipeController {
         try {
             // Check if user is authenticated
             if (!securityUtils.isAuthenticated()) {
+                logger.debug("getMyRecipes - User not authenticated, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
             SysUser currentUser = securityUtils.getCurrentUser();
             if (currentUser == null) {
+                logger.debug("getMyRecipes - Cannot find SysUser record for authenticated user, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
@@ -323,6 +335,7 @@ public class RecipeController {
         try {
             // Check if user is authenticated
             if (!securityUtils.isAuthenticated()) {
+                logger.debug("getPublicRecipes - User not authenticated, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
@@ -358,11 +371,13 @@ public class RecipeController {
         try {
             // Check if user is authenticated
             if (!securityUtils.isAuthenticated()) {
+                logger.debug("findByDietaryPreferences - User not authenticated, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
             SysUser currentUser = securityUtils.getCurrentUser();
             if (currentUser == null) {
+                logger.debug("findByDietaryPreferences - Cannot find SysUser record for authenticated user, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
@@ -403,11 +418,13 @@ public class RecipeController {
         try {
             // Check if user is authenticated
             if (!securityUtils.isAuthenticated()) {
+                logger.debug("findQuickRecipes - User not authenticated, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
             SysUser currentUser = securityUtils.getCurrentUser();
             if (currentUser == null) {
+                logger.debug("findQuickRecipes - Cannot find SysUser record for authenticated user, returning 401");
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 

@@ -69,6 +69,10 @@ export const useSysUsersService = () => {
   const update = useCallback(async (id: number, data: UpdateSysUser): Promise<DisplaySysUser> => {
     try {
       const response = await authClient.put(`/users/${id}`, data);
+      if (response.status === 204) {
+        // If no content returned, return the data that was sent
+        return { ...data, id } as DisplaySysUser;
+      }
       return response.data;
     } catch (error) {
       if (error instanceof Error) {
@@ -82,6 +86,10 @@ export const useSysUsersService = () => {
   const updateDefaultChecked = useCallback(async (id: number, defaultChecked: boolean): Promise<DisplaySysUser> => {
     try {
       const response = await authClient.put(`/users/${id}/defaultchecked`, { defaultChecked });
+      if (response.status === 204) {
+        // If no content returned, construct a minimal response
+        return { id, defaultChecked } as DisplaySysUser;
+      }
       return response.data;
     } catch (error) {
       if (error instanceof Error) {

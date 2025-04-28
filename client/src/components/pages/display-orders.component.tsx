@@ -1,25 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useRecipeOrdersService } from '../../services/recipe-orders.service';
 import { RecipeOrder } from '../../models/recipe-order';
 import { DisplayRecipeOrderDetails } from '../../models/recipe-order-details';
 
 const DisplayOrders: React.FC = () => {
-  // Use the hook for recipe orders service
-  const recipeOrdersService = useRecipeOrdersService();
-  
   const [orders, setOrders] = useState<RecipeOrder[]>([]);
-  const [currentOrder, setCurrentOrder] = useState<RecipeOrder | null>(null);
-  const [currentIndex, setCurrentIndex] = useState<number>(-1);
+  const [activeOrder, setActiveOrder] = useState<RecipeOrder | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currentOrderDetails, setCurrentOrderDetails] = useState<DisplayRecipeOrderDetails | null>(null);
 
-  useEffect(() => {
-    retrieveOrders();
-  }, [recipeOrdersService]);
+  const recipeOrdersService = useRecipeOrdersService();
 
-  const retrieveOrders = async () => {
+  const retrieveOrders = useCallback(async () => {
     try {
       setLoading(true);
       const data = await recipeOrdersService.getAll();
@@ -30,12 +25,16 @@ const DisplayOrders: React.FC = () => {
       setError('Failed to load orders');
       setLoading(false);
     }
-  };
+  }, [recipeOrdersService]);
 
-  const setActiveOrder = async (order: RecipeOrder, index: number) => {
+  useEffect(() => {
+    retrieveOrders();
+  }, [retrieveOrders]);
+
+  const handleSetActiveOrder = async (order: RecipeOrder, index: number) => {
     try {
-      setCurrentOrder(order);
-      setCurrentIndex(index);
+      setActiveOrder(order);
+      setActiveIndex(index);
       
       // Fetch order details using the correct endpoint and interface
       const orderDetails = await recipeOrdersService.get(order.id);
@@ -80,9 +79,9 @@ const DisplayOrders: React.FC = () => {
           {orders && orders.map((order, index) => (
             <li
               className={
-                "list-group-item " + (index === currentIndex ? "active" : "")
+                "list-group-item " + (index === activeIndex ? "active" : "")
               }
-              onClick={() => setActiveOrder(order, index)}
+              onClick={() => handleSetActiveOrder(order, index)}
               key={index}
             >
               Order #{order.id} ({formatDate(order.createdAt)}) - 
@@ -96,9 +95,9 @@ const DisplayOrders: React.FC = () => {
         </Link>
       </div>
       <div className="col-md-6">
-        {currentOrder && currentOrderDetails ? (
+        {activeOrder && currentOrderDetails ? (
           <div>
-            <h4>Order #{currentOrder.id}</h4>
+            <h4>Order #{activeOrder.id}</h4>
             {currentOrderDetails.message && (
               <div>
                 <label><strong>Message:</strong></label>{" "}
@@ -125,7 +124,7 @@ const DisplayOrders: React.FC = () => {
             </ul>
 
             <Link
-              to={"/orders/" + currentOrder.id}
+              to={"/orders/" + activeOrder.id}
               className="btn btn-warning ms-2"
             >
               Edit
