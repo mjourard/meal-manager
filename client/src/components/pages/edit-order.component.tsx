@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useRecipeOrdersService } from '../../services/recipe-orders.service';
 import { useRecipesService } from '../../services/recipes.service';
@@ -33,16 +33,7 @@ const EditOrder: React.FC = () => {
   const navigate = useNavigate();
   const isNewOrder = id === 'new';
 
-  useEffect(() => {
-    loadRecipesAndUsers();
-    if (!isNewOrder && id) {
-      getOrder(parseInt(id, 10));
-    } else {
-      setLoading(false);
-    }
-  }, [id, isNewOrder]);
-
-  const loadRecipesAndUsers = async () => {
+  const loadRecipesAndUsers = useCallback(async () => {
     try {
       const recipesData = await recipesService.getAll();
       setAvailableRecipes(recipesData.filter((recipe: DisplayRecipe) => !recipe.disabled));
@@ -53,9 +44,9 @@ const EditOrder: React.FC = () => {
       console.error('Error loading data:', error);
       setError('Failed to load recipes or users');
     }
-  };
+  }, [recipesService, sysUsersService]);
 
-  const getOrder = async (id: number) => {
+  const getOrder = useCallback(async (id: number) => {
     try {
       const orderData = await recipeOrdersService.get(id);
       setCurrentOrder(orderData);
@@ -65,7 +56,16 @@ const EditOrder: React.FC = () => {
       setError('Error retrieving order');
       setLoading(false);
     }
-  };
+  }, [recipeOrdersService]);
+
+  useEffect(() => {
+    loadRecipesAndUsers();
+    if (!isNewOrder && id) {
+      getOrder(parseInt(id, 10));
+    } else {
+      setLoading(false);
+    }
+  }, [id, isNewOrder, loadRecipesAndUsers, getOrder]);
 
   const handleRecipeChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setSelectedRecipeId(parseInt(e.target.value, 10));

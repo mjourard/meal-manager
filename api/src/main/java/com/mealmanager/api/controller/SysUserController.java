@@ -1,12 +1,15 @@
 package com.mealmanager.api.controller;
 
 import com.mealmanager.api.dto.EmailTemplateData;
+import com.mealmanager.api.dto.UserRegistrationResponse;
 import com.mealmanager.api.dto.templatedata.GroceryMealOrderData;
 import com.mealmanager.api.messagequeue.Receiver;
 import com.mealmanager.api.messagequeue.Sender;
 import com.mealmanager.api.model.SysUser;
 import com.mealmanager.api.repository.SysUserRepository;
+import com.mealmanager.api.security.SecurityUtils;
 import com.mealmanager.api.services.EmailService;
+import com.mealmanager.api.services.UserRegistrationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +48,72 @@ public class SysUserController {
 
     @Autowired
     Sender sender;
+    
+    @Autowired
+    SecurityUtils securityUtils;
+    
+    @Autowired
+    UserRegistrationService userRegistrationService;
+    
+    /**
+     * Register the currently authenticated user in the system
+     * This endpoint uses the JWT token to identify the user and fetch their details from Clerk
+     * 
+     * @return User registration details or error
+     */
+    @PostMapping("/users/me")
+    public ResponseEntity<?> registerCurrentUser() {
+        logger.debug("Registering current user based on JWT token");
+        
+        // Check if the request is authenticated
+        if (!securityUtils.isAuthenticated()) {
+            logger.debug("Register current user - User not authenticated, returning 401");
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        
+        // Check if the user ID is available in the security context
+        Optional<String> currentUserIdOpt = securityUtils.getCurrentUserId();
+        if (currentUserIdOpt.isEmpty()) {
+            logger.error("Register current user - User ID not found in security context");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body("Unable to extract user ID from authentication token");
+        }
+        
+        String clerkUserId = currentUserIdOpt.get();
+        boolean isNewUser = false;
+        
+        // Check if user already exists
+        Optional<SysUser> existingUser = sysUserRepository.findByClerkUserId(clerkUserId);
+        SysUser user;
+        
+        if (existingUser.isPresent()) {
+            user = existingUser.get();
+            logger.info("User already exists with Clerk ID: {}", clerkUserId);
+        } else {
+            // Register the new user
+            user = userRegistrationService.registerCurrentUser();
+            
+            if (user == null) {
+                logger.error("Failed to register user with Clerk ID: {}", clerkUserId);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to register user");
+            }
+            
+            isNewUser = true;
+            logger.info("Successfully registered new user with Clerk ID: {}", clerkUserId);
+        }
+        
+        // Prepare response
+        UserRegistrationResponse response = new UserRegistrationResponse();
+        response.setId(user.getId());
+        response.setFirstName(user.getFirstName());
+        response.setLastName(user.getLastName());
+        response.setEmail(user.getEmail());
+        response.setClerkUserId(user.getClerkUserId());
+        response.setIsNewUser(isNewUser);
+        
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
     @GetMapping("/users")
     public ResponseEntity<List<SysUser>> getAllSysUsers(@RequestParam(required = false) String name) {

@@ -1,8 +1,8 @@
 #!/bin/bash
 set -eo pipefail
 
-## Mount this file in /docker-entrypoint-initaws.d so that localstack runs it
-## as part of its entrypoint routine.
+## This file needs to be mounted in the container for it to run on startup.
+## See https://docs.localstack.cloud/references/init-hooks/ for details
 
 for EMAIL_ADDRESS in $(echo $LOCALSTACK_SES_VERIFIED_EMAIL_ADDRESSES | sed "s/,/ /g")
 do

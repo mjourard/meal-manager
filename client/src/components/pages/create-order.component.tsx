@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecipesService } from '../../services/recipes.service';
 import { useSysUsersService } from '../../services/sys-users.service';
@@ -10,11 +10,27 @@ import { CreateRecipeOrderDetails } from '../../models/recipe-order-details';
 
 const COMPONENT_NAME = 'CreateOrder';
 
+/**
+ * CreateOrder component allows users to create new orders by selecting recipes and recipients.
+ * 
+ * Implementation notes:
+ * - Uses refs to track data loading state to prevent unnecessary API calls
+ * - Implements request tracking to prevent duplicate requests
+ * - Properly handles component mounting/unmounting
+ * - Uses logging for debugging and auditing
+ */
 const CreateOrder: React.FC = () => {
   const navigate = useNavigate();
-  const recipesService = useRecipesService();
-  const usersService = useSysUsersService();
-  const recipeOrdersService = useRecipeOrdersService();
+  
+  // Refs to prevent unnecessary API calls
+  const dataLoaded = useRef(false);
+  const requestInProgress = useRef(false);
+  const isMounted = useRef(false);
+  
+  // Stabilize service references
+  const recipesServiceRef = useRef(useRecipesService());
+  const usersServiceRef = useRef(useSysUsersService());
+  const recipeOrdersServiceRef = useRef(useRecipeOrdersService());
   
   // Call the hook at the top level
   const logger = useLoggingService({
@@ -33,8 +49,14 @@ const CreateOrder: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [searchRecipe, setSearchRecipe] = useState<string>('');
   
-  // Create a data loading function outside of useEffect to avoid dependencies
-  const loadData = async () => {
+  // Create a data loading function with useCallback to avoid recreating on every render
+  const loadData = useCallback(async () => {
+    // Skip if already loaded or request in progress or component not mounted
+    if (dataLoaded.current || requestInProgress.current || !isMounted.current) return;
+    
+    // Set flag to avoid concurrent requests
+    requestInProgress.current = true;
+    
     const sessionId = Date.now().toString();
     
     logger.info(`Fetching initial data for order creation [Session: ${sessionId}]`, COMPONENT_NAME);
@@ -44,41 +66,64 @@ const CreateOrder: React.FC = () => {
       logger.debug(`Fetching recipes, users, and default users [Session: ${sessionId}]`, COMPONENT_NAME);
       
       const [recipesData, usersData, defaultUsers] = await Promise.all([
-        recipesService.getAll(),
-        usersService.getAll(),
-        usersService.getDefaultChecked()
+        recipesServiceRef.current.getAll(),
+        usersServiceRef.current.getAll(),
+        usersServiceRef.current.getDefaultChecked()
       ]);
       
-      logger.debug(
-        `Retrieved ${recipesData.length} recipes, ${usersData.length} users, ${defaultUsers.length} default users`, 
-        COMPONENT_NAME
-      );
-      
-      setRecipes(recipesData);
-      setUsers(usersData);
-      
-      // Pre-select default users
-      const defaultUserIds = defaultUsers.map(user => user.id);
-      setSelectedUserIds(defaultUserIds);
-      
-      logger.debug(`Pre-selected ${defaultUserIds.length} default users`, COMPONENT_NAME);
+      // Only update state if component is still mounted
+      if (isMounted.current) {
+        logger.debug(
+          `Retrieved ${recipesData.length} recipes, ${usersData.length} users, ${defaultUsers.length} default users`, 
+          COMPONENT_NAME
+        );
+        
+        setRecipes(recipesData);
+        setUsers(usersData);
+        
+        // Pre-select default users
+        const defaultUserIds = defaultUsers.map(user => user.id);
+        setSelectedUserIds(defaultUserIds);
+        
+        logger.debug(`Pre-selected ${defaultUserIds.length} default users`, COMPONENT_NAME);
+        
+        dataLoaded.current = true;
+        setLoading(false);
+      }
     } catch (error) {
       logger.error('Failed to load data for order creation', error, COMPONENT_NAME);
-      setError('Failed to load data. Please try again.');
+      
+      // Only update state if component is still mounted
+      if (isMounted.current) {
+        setError('Failed to load data. Please try again.');
+        setLoading(false);
+      }
     } finally {
-      setLoading(false);
-      logger.info(`Initial data loading completed ${error ? 'with errors' : 'successfully'}`, COMPONENT_NAME);
+      requestInProgress.current = false;
+      
+      if (isMounted.current) {
+        logger.info(`Initial data loading completed ${error ? 'with errors' : 'successfully'}`, COMPONENT_NAME);
+      }
     }
-  };
+  }, [logger]);
   
-  // Fetch recipes and users on component mount
+  // Set up component mount/unmount handling and initial data loading
   useEffect(() => {
-    // Only load data once when the component mounts
+    // Set mounted flag
+    isMounted.current = true;
+    
+    // Call loadData once
     loadData();
     
-    // Empty dependency array means this only runs once on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // Log component mount
+    logger.info('CreateOrder component mounted', COMPONENT_NAME);
+    
+    // Cleanup: reset mounted flag and log unmount
+    return () => {
+      isMounted.current = false;
+      logger.info('CreateOrder component unmounting', COMPONENT_NAME);
+    };
+  }, [loadData, logger]);
   
   const handleRecipeToggle = (recipeId: number) => {
     setSelectedRecipeIds(prevSelected => {
@@ -133,11 +178,13 @@ const CreateOrder: React.FC = () => {
     logger.debug(`Search query updated to "${searchTerm}"`, COMPONENT_NAME);
   };
   
-  const filteredRecipes = searchRecipe
-    ? recipes.filter(recipe => 
-        recipe.name.toLowerCase().includes(searchRecipe.toLowerCase())
-      )
-    : recipes;
+  const filteredRecipes = useMemo(() => {
+    return searchRecipe
+      ? recipes.filter(recipe => 
+          recipe.name.toLowerCase().includes(searchRecipe.toLowerCase())
+        )
+      : recipes;
+  }, [searchRecipe, recipes]);
     
   useEffect(() => {
     if (searchRecipe) {
@@ -147,9 +194,7 @@ const CreateOrder: React.FC = () => {
         COMPONENT_NAME
       );
     }
-  // Remove logger from dependency array to prevent re-renders
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchRecipe, filteredRecipes.length, recipes.length]);
+  }, [searchRecipe, filteredRecipes.length, recipes.length, logger, COMPONENT_NAME]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -195,16 +240,20 @@ const CreateOrder: React.FC = () => {
         message: message
       };
       
-      const response = await recipeOrdersService.create(orderData);
+      const response = await recipeOrdersServiceRef.current.create(orderData);
       
-      logger.info(`Order #${response.id} created successfully`, COMPONENT_NAME);
-      setSuccess(`Order #${response.id} created successfully!`);
-      
-      // Wait briefly then redirect to the orders page
-      setTimeout(() => {
-        logger.info(`Redirecting to orders page`, COMPONENT_NAME);
-        navigate('/orders');
-      }, 1500);
+      if (isMounted.current) {
+        logger.info(`Order #${response.id} created successfully`, COMPONENT_NAME);
+        setSuccess(`Order #${response.id} created successfully!`);
+        
+        // Wait briefly then redirect to the orders page
+        setTimeout(() => {
+          if (isMounted.current) {
+            logger.info(`Redirecting to orders page`, COMPONENT_NAME);
+            navigate('/orders');
+          }
+        }, 1500);
+      }
     } catch (error) {
       logger.error(
         `Failed to create order with ${selectedRecipeIds.length} recipes and ${selectedUserIds.length} users`, 
@@ -212,9 +261,13 @@ const CreateOrder: React.FC = () => {
         COMPONENT_NAME
       );
       
-      setError('Failed to create order. Please try again.');
+      if (isMounted.current) {
+        setError('Failed to create order. Please try again.');
+      }
     } finally {
-      setSubmitting(false);
+      if (isMounted.current) {
+        setSubmitting(false);
+      }
     }
   };
   
@@ -244,18 +297,8 @@ const CreateOrder: React.FC = () => {
     }
   };
   
-  // Log component render and cleanup
-  useEffect(() => {
-    logger.info('CreateOrder component mounted', COMPONENT_NAME);
-    
-    return () => {
-      logger.info('CreateOrder component unmounting', COMPONENT_NAME);
-    };
-  // Empty dependency array means this only runs once on mount/unmount
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  
-  if (loading) {
+  // Show loading spinner while data is being loaded
+  if (loading && !dataLoaded.current) {
     return (
       <div className="d-flex justify-content-center mt-5">
         <div className="spinner-border" role="status">

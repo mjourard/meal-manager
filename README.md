@@ -15,7 +15,7 @@ Instructions:
 2. Follow these instructions to start up a prod-like build. This will pull down the current docker images from dockerhub: 
 ```
 pushd .docker
-docker-compose -f docker-compose.prod.yml --env-file ../env-files/.env up
+docker compose -f docker-compose.prod.yml --env-file ../env-files/.env up
 ```
 
 And you're good to go

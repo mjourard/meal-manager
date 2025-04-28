@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useRecipesService } from '../../services/recipes.service';
 import { Recipe } from '../../models/recipe';
@@ -19,7 +19,7 @@ const EditRecipe: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const getRecipe = async (id: number) => {
+  const getRecipe = useCallback(async (id: number) => {
     try {
       const response = await recipesService.get(id);
       setCurrentRecipe(response);
@@ -27,13 +27,13 @@ const EditRecipe: React.FC = () => {
       console.error('Error retrieving recipe:', error);
       setMessage('Error retrieving recipe');
     }
-  };
+  }, [recipesService]);
 
   useEffect(() => {
     if (id) {
       getRecipe(parseInt(id, 10));
     }
-  }, [id]);
+  }, [id, getRecipe]);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
