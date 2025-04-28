@@ -1,7 +1,6 @@
 package com.mealmanager.api.services;
 
 import com.mealmanager.api.model.CrawlerJob;
-import com.mealmanager.api.model.CrawlerStorage;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -14,10 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 

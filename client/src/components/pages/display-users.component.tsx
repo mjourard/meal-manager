@@ -14,7 +14,7 @@ const DisplayUsers: React.FC = () => {
 
   useEffect(() => {
     retrieveUsers();
-  }, []);
+  }, [sysUsersService]);
 
   const retrieveUsers = async () => {
     try {

@@ -69,7 +69,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Optional<String> token = getJwtFromRequest(request);
             if (token.isPresent()) {
                 if (debugEnabled) {
-                    log.debug("JWT token found in request");
+                    log.debug("JWT token found in request for URL: {}", request.getRequestURI());
                 }
                 validateToken(token.get())
                     .ifPresentOrElse(
@@ -79,11 +79,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                 log.debug("Authentication successful for user: {}", jwt.getSubject());
                             }
                         },
-                        () -> log.warn("Failed to validate JWT token")
+                        () -> {
+                            log.warn("Failed to validate JWT token for URL: {}", request.getRequestURI());
+                            if (debugEnabled) {
+                                try {
+                                    DecodedJWT debugJwt = JWT.decode(token.get());
+                                    log.debug("Invalid token details - Issuer: {}, KeyID: {}", 
+                                        debugJwt.getIssuer(), debugJwt.getKeyId());
+                                    log.debug("Expected issuer: {}", jwtConfig.getIssuer());
+                                } catch (Exception e) {
+                                    log.debug("Could not decode token for debugging: {}", e.getMessage());
+                                }
+                            }
+                        }
                     );
+            } else if (debugEnabled) {
+                log.debug("No JWT token found in request for URL: {}", request.getRequestURI());
             }
         } catch (Exception e) {
-            log.error("JWT Authentication failed", e);
+            log.error("JWT Authentication failed: {}", e.getMessage());
+            if (debugEnabled) {
+                log.debug("JWT Authentication exception details:", e);
+            }
         }
 
         filterChain.doFilter(request, response);
@@ -118,6 +135,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 log.debug("JWT Subject: {}", debugJwt.getSubject());
                 log.debug("JWT Issuer: {}", debugJwt.getIssuer());
                 log.debug("JWT Key ID: {}", debugJwt.getKeyId());
+                
+                // Check if token is expired
+                if (debugJwt.getExpiresAt() != null && debugJwt.getExpiresAt().before(new java.util.Date())) {
+                    log.debug("JWT token is expired. Expiration: {}, Current time: {}", 
+                        debugJwt.getExpiresAt(), new java.util.Date());
+                    return Optional.empty();
+                }
             }
             
             // Safe decoding for actual verification

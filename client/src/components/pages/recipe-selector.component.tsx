@@ -12,7 +12,7 @@ const RecipeSelector: React.FC = () => {
 
   useEffect(() => {
     retrieveRecipes();
-  }, []);
+  }, [recipesService]);
 
   const onChangeSearchName = (e: ChangeEvent<HTMLInputElement>) => {
     const searchName = e.target.value;

@@ -45,9 +45,8 @@ const DisplayRecipes: React.FC = () => {
     // Use useEffect with an empty dependency array to fetch data only once when the component mounts
     useEffect(() => {
         retrieveRecipes();
-        // Don't include retrieveRecipes in the dependency array to prevent continuous calls
-        // We only want to fetch recipes once when the component mounts
-    }, []);
+        // Dependency on retrieveRecipes to ensure it has access to the latest version of recipesService
+    }, [retrieveRecipes]);
 
     return (
         <div className="list row">

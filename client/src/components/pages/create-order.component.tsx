@@ -76,7 +76,8 @@ const CreateOrder: React.FC = () => {
     // Only load data once when the component mounts
     loadData();
     
-    // Empty dependency array means this only runs once on mount
+    // Intentionally omitting loadData from dependencies as it's designed to be called only once on mount.
+    // This avoids re-fetching when service hooks change references.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
@@ -251,7 +252,7 @@ const CreateOrder: React.FC = () => {
     return () => {
       logger.info('CreateOrder component unmounting', COMPONENT_NAME);
     };
-  // Empty dependency array means this only runs once on mount/unmount
+  // This useEffect uses logger but only needs to run once on mount/unmount
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   

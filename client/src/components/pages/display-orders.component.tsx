@@ -17,7 +17,7 @@ const DisplayOrders: React.FC = () => {
 
   useEffect(() => {
     retrieveOrders();
-  }, []);
+  }, [recipeOrdersService]);
 
   const retrieveOrders = async () => {
     try {
