@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useSysUsersService } from '../../services/sys-users.service';
 import { SysUser } from '../../models/sys-user';
+import { useUserRegistration } from '../../hooks/useUserRegistration';
 
 /**
  * DisplayUsers component shows the list of system users and allows interaction with them.
@@ -11,6 +12,7 @@ import { SysUser } from '../../models/sys-user';
  *   when no users exist (avoids infinite loading/flickering)
  * - Updates local state directly when toggling user properties to avoid unnecessary API calls
  * - Uses request tracking to prevent duplicate API calls
+ * - Includes button to register current authenticated user with the system
  */
 const DisplayUsers: React.FC = () => {
   const [users, setUsers] = useState<SysUser[]>([]);
@@ -18,6 +20,7 @@ const DisplayUsers: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
   // Refs to prevent unnecessary API calls
   const usersLoaded = useRef(false);
@@ -25,6 +28,13 @@ const DisplayUsers: React.FC = () => {
   const isMounted = useRef(false);
   // Stabilize the service reference
   const sysUsersServiceRef = useRef(useSysUsersService());
+  
+  // User registration hook
+  const { 
+    registerUser, 
+    loading: registrationLoading, 
+    registrationError 
+  } = useUserRegistration();
 
   // Use the stabilized service reference
   const retrieveUsers = useCallback(async () => {
@@ -56,7 +66,7 @@ const DisplayUsers: React.FC = () => {
     } finally {
       requestInProgress.current = false;
     }
-  }, []); // No dependencies to avoid recreation
+  }, [sysUsersServiceRef, usersLoaded, requestInProgress, isMounted]);
 
   useEffect(() => {
     // Set mounted flag
@@ -97,6 +107,34 @@ const DisplayUsers: React.FC = () => {
       setError('Failed to update user status');
     }
   };
+  
+  const handleRegisterCurrentUser = async () => {
+    // Clear any previous messages
+    setError(null);
+    setSuccessMessage(null);
+    
+    try {
+      const userData = await registerUser();
+      
+      if (userData) {
+        // Show success message
+        if (userData.isNewUser) {
+          setSuccessMessage(`Successfully registered as ${userData.firstName} ${userData.lastName}`);
+        } else {
+          setSuccessMessage(`User account already exists for ${userData.firstName} ${userData.lastName}`);
+        }
+        
+        // Reset loading state to reload the users list
+        usersLoaded.current = false;
+        retrieveUsers();
+      } else if (registrationError) {
+        setError(registrationError);
+      }
+    } catch (error) {
+      console.error('Error during registration:', error);
+      setError('An unexpected error occurred during registration');
+    }
+  };
 
   if (loading && !usersLoaded.current) {
     return (
@@ -114,6 +152,41 @@ const DisplayUsers: React.FC = () => {
 
   return (
     <div className="list row">
+      <div className="col-12 mb-4">
+        {successMessage && (
+          <div className="alert alert-success alert-dismissible fade show" role="alert">
+            {successMessage}
+            <button 
+              type="button" 
+              className="btn-close" 
+              onClick={() => setSuccessMessage(null)}
+              aria-label="Close"
+            ></button>
+          </div>
+        )}
+        
+        <div className="d-flex justify-content-between align-items-center">
+          <h2>Users Management</h2>
+          <button 
+            className="btn btn-success" 
+            onClick={handleRegisterCurrentUser}
+            disabled={registrationLoading}
+          >
+            {registrationLoading ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Registering...
+              </>
+            ) : (
+              'Register Current User'
+            )}
+          </button>
+        </div>
+        <p className="text-muted">
+          Register your Clerk account with the system to create a local user profile.
+        </p>
+      </div>
+      
       <div className="col-md-6">
         <h4>Users List</h4>
 

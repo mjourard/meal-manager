@@ -9,3 +9,4 @@ alwaysApply: false
 - react components should favour functional components over class components
 - react components should be declared in their file. The filename should be the kebab-case version of the component's name
 - the names of the files containing react components always follow the pattern of <kebab-case-component-name>.component.tsx
+- when you identify a bad pattern that was implemented, do not check all other react files for that bad pattern. Instead, prompt the user that this bad pattern was identified and it is recommended to investigate other components for this bad pattern. It is fine to investigate other components and pages within that functional area of the client.

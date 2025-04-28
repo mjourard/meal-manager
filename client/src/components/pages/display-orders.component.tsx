@@ -1,9 +1,18 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useRecipeOrdersService } from '../../services/recipe-orders.service';
 import { RecipeOrder } from '../../models/recipe-order';
 import { DisplayRecipeOrderDetails } from '../../models/recipe-order-details';
 
+/**
+ * DisplayOrders component shows the list of recipe orders and allows viewing their details.
+ * 
+ * Implementation notes:
+ * - Uses a useRef to track if orders have been loaded to prevent continuous API calls
+ *   when no orders exist (avoids infinite loading/flickering)
+ * - Uses request tracking to prevent duplicate API calls
+ * - Properly tracks component mounting state
+ */
 const DisplayOrders: React.FC = () => {
   const [orders, setOrders] = useState<RecipeOrder[]>([]);
   const [activeOrder, setActiveOrder] = useState<RecipeOrder | null>(null);
@@ -12,23 +21,55 @@ const DisplayOrders: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentOrderDetails, setCurrentOrderDetails] = useState<DisplayRecipeOrderDetails | null>(null);
 
-  const recipeOrdersService = useRecipeOrdersService();
+  // Refs to prevent unnecessary API calls
+  const ordersLoaded = useRef(false);
+  const requestInProgress = useRef(false);
+  const isMounted = useRef(false);
+  // Stabilize the service reference
+  const recipeOrdersServiceRef = useRef(useRecipeOrdersService());
 
   const retrieveOrders = useCallback(async () => {
+    // Skip if already loaded or request in progress or component not mounted
+    if (ordersLoaded.current || requestInProgress.current || !isMounted.current) return;
+    
+    // Set flag to avoid concurrent requests
+    requestInProgress.current = true;
+    
     try {
       setLoading(true);
-      const data = await recipeOrdersService.getAll();
-      setOrders(data);
-      setLoading(false);
+      const data = await recipeOrdersServiceRef.current.getAll();
+      
+      // Only update state if component is still mounted
+      if (isMounted.current) {
+        setOrders(data);
+        ordersLoaded.current = true;
+        setLoading(false);
+      }
     } catch (error) {
       console.error('Error retrieving orders:', error);
-      setError('Failed to load orders');
-      setLoading(false);
+      
+      // Only update state if component is still mounted
+      if (isMounted.current) {
+        setError('Failed to load orders');
+        ordersLoaded.current = true;
+        setLoading(false);
+      }
+    } finally {
+      requestInProgress.current = false;
     }
-  }, [recipeOrdersService]);
+  }, []);
 
   useEffect(() => {
+    // Set mounted flag
+    isMounted.current = true;
+    
+    // Call retrieveOrders once
     retrieveOrders();
+    
+    // Cleanup: reset mounted flag
+    return () => {
+      isMounted.current = false;
+    };
   }, [retrieveOrders]);
 
   const handleSetActiveOrder = async (order: RecipeOrder, index: number) => {
@@ -37,7 +78,7 @@ const DisplayOrders: React.FC = () => {
       setActiveIndex(index);
       
       // Fetch order details using the correct endpoint and interface
-      const orderDetails = await recipeOrdersService.get(order.id);
+      const orderDetails = await recipeOrdersServiceRef.current.get(order.id);
       setCurrentOrderDetails(orderDetails);
     } catch (error) {
       console.error('Error retrieving order details:', error);
@@ -62,8 +103,14 @@ const DisplayOrders: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
+  if (loading && !ordersLoaded.current) {
+    return (
+      <div className="d-flex justify-content-center mt-5">
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
@@ -75,20 +122,26 @@ const DisplayOrders: React.FC = () => {
       <div className="col-md-6">
         <h4>Orders List</h4>
 
-        <ul className="list-group">
-          {orders && orders.map((order, index) => (
-            <li
-              className={
-                "list-group-item " + (index === activeIndex ? "active" : "")
-              }
-              onClick={() => handleSetActiveOrder(order, index)}
-              key={index}
-            >
-              Order #{order.id} ({formatDate(order.createdAt)}) - 
-              {order.fulfilled ? " Fulfilled" : " Pending"}
-            </li>
-          ))}
-        </ul>
+        {orders.length === 0 ? (
+          <div className="alert alert-info">
+            No orders found. Create a new order to get started.
+          </div>
+        ) : (
+          <ul className="list-group">
+            {orders.map((order, index) => (
+              <li
+                className={
+                  "list-group-item " + (index === activeIndex ? "active" : "")
+                }
+                onClick={() => handleSetActiveOrder(order, index)}
+                key={index}
+              >
+                Order #{order.id} ({formatDate(order.createdAt)}) - 
+                {order.fulfilled ? " Fulfilled" : " Pending"}
+              </li>
+            ))}
+          </ul>
+        )}
 
         <Link to="/orders/new" className="btn btn-primary mt-3">
           New Order

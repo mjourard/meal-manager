@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCrawlerJobsService, CrawlerJobResponse } from '../../services/crawler-jobs.service';
 
@@ -13,7 +13,7 @@ const CrawlerJobDetails: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [performingAction, setPerformingAction] = useState<boolean>(false);
   
-  const fetchJobDetails = async () => {
+  const fetchJobDetails = useCallback(async () => {
     if (!id) return;
     
     try {
@@ -28,7 +28,7 @@ const CrawlerJobDetails: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, crawlerJobsService]);
 
   const handlePerformAction = async (actionType: 'retry' | 'archive') => {
     if (!id) return;
@@ -52,7 +52,7 @@ const CrawlerJobDetails: React.FC = () => {
 
   useEffect(() => {
     fetchJobDetails();
-  }, [id, fetchJobDetails]);
+  }, [fetchJobDetails]);
 
   const formatDate = (dateString: string | null): string => {
     if (!dateString) return 'N/A';

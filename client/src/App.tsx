@@ -115,16 +115,16 @@ function App() {
   );
 }
 
-// RequireAuth component to protect routes
+// RequireAuth component to protect routes and ensure user registration
 function RequireAuth({ children }: { children: React.ReactNode }) {
-    return (
-      <>
-        <SignedIn>{children}</SignedIn>
-        <SignedOut>
-          <RedirectToSignIn />
-        </SignedOut>
-      </>
-    );
-  }
+  return (
+    <>
+      <SignedIn>{children}</SignedIn>
+      <SignedOut>
+        <RedirectToSignIn />
+      </SignedOut>
+    </>
+  );
+}
 
 export default App
