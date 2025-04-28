@@ -1,2 +1,2 @@
-volumes/localstack/*
-!volumes/localstack/.keep
+!volumes/localstack/data/.keep
+volumes/localstack/data/*

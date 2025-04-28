@@ -19,19 +19,16 @@ services:
     ports:
       - "4566:4566"
       - "4571:4571"
-      - "${PORT_WEB_UI-5000}:${PORT_WEB_UI-5000}"
     environment:
       - AWS_REGION=us-east-1
       - DATA_DIR=${DATA_DIR- }
       - DEBUG=${DEBUG- }
-      - DEFAULT_REGION=us-east-1
       - DOCKER_HOST=unix:///var/run/docker.sock
-      - PORT_WEB_UI=${PORT_WEB_UI-9000}
       - SERVICES=ses,s3,iam
     volumes:
-      - "${LOCALSTACK_VOLUME_DIR:-./volumes/localstack}:/var/lib/localstack"
+      - "${LOCALSTACK_VOLUME_DIR:-./volumes/localstack/data}:/var/lib/localstack"
+      - "./volumes/localstack/init:/etc/localstack/init"
       - "/var/run/docker.sock:/var/run/docker.sock"
-      - "./volumes/docker-entrypoint-initaws.d:/docker-entrypoint-initaws.d"
   hoster:
     container_name: hoster
     image: dvdarias/docker-hoster
