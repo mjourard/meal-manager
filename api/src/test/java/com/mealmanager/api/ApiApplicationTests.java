@@ -14,6 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Main application test that ensures the Spring context loads correctly.
+ * This test uses the BaseTestContainersTest which includes DisableRabbitListenersInitializer
+ * to prevent RabbitMQ listeners from starting and causing authentication errors.
  */
 class ApiApplicationTests extends BaseTestContainersTest {
 	private static final Logger logger = LoggerFactory.getLogger(ApiApplicationTests.class);
