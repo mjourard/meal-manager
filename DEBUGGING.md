@@ -90,7 +90,7 @@ If the application can't connect to the database:
 
 1. Check API logs for database connection errors
 2. Verify database configuration in `application.properties`
-3. Ensure PostgreSQL is running (`docker-compose up -d db`)
+3. Ensure PostgreSQL is running (`docker compose up -d db`)
 4. Review connection logs in the database server
 
 ## Using Console Logging for Immediate Debugging

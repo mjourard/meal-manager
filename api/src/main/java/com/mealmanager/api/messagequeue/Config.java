@@ -8,17 +8,22 @@ import org.springframework.context.annotation.Configuration;
 public class Config {
 
     @Bean
-    public Queue email() {
+    public Queue emailQueue() {
         return new Queue("email");
     }
 
     @Bean
-    public Receiver receiver() {
-        return new Receiver();
+    public Queue crawlerJobQueue() {
+        return new Queue("crawler-job");
     }
 
     @Bean
     public Sender sender() {
         return new Sender();
+    }
+
+    @Bean
+    public Receiver receiver() {
+        return new Receiver();
     }
 }

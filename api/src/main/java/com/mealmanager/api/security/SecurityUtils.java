@@ -2,6 +2,9 @@ package com.mealmanager.api.security;
 
 import java.util.Optional;
 
+import com.mealmanager.api.model.SysUser;
+import com.mealmanager.api.repository.SysUserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -12,6 +15,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SecurityUtils {
+
+    @Autowired
+    private SysUserRepository sysUserRepository;
 
     /**
      * Get the Clerk user ID of the currently authenticated user
@@ -28,6 +34,19 @@ public class SecurityUtils {
         }
         
         return Optional.empty();
+    }
+    
+    /**
+     * Get the currently authenticated user
+     * 
+     * @return SysUser object or null if not authenticated
+     */
+    public SysUser getCurrentUser() {
+        Optional<String> currentUserId = getCurrentUserId();
+        if (currentUserId.isPresent()) {
+            return sysUserRepository.findByClerkUserId(currentUserId.get()).orElse(null);
+        }
+        return null;
     }
     
     /**
