@@ -12,6 +12,28 @@ on:
         type: environment
 
 jobs:
+  changes:
+    name: Detect changed paths
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      api: ${{ steps.filter.outputs.api }}
+      client: ${{ steps.filter.outputs.client }}
+      terraform: ${{ steps.filter.outputs.terraform }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      # Diffs the whole push/PR (not just the head commit) against .github/path-filters.yml
+      - name: Filter changed paths
+        id: filter
+        if: github.event_name != 'workflow_dispatch'
+        uses: dorny/paths-filter@v4
+        with:
+          filters: .github/path-filters.yml
+
 # Disable until we have a test suite
 #   test:
 #     name: Run Tests
@@ -20,7 +42,8 @@ jobs:
   deploy-api:
     name: Deploy API
     runs-on: ubuntu-latest
-    if: ${{ success() && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.modified, 'api/') || contains(github.event.head_commit.added, 'api/')) }}
+    needs: changes
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.api == 'true' }}
     environment: ${{ inputs.environment || 'production' }}
     permissions:
       contents: read
@@ -28,7 +51,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       
       - name: Set environment variables
         run: |
@@ -46,7 +69,7 @@ jobs:
           echo "java_version=$JAVA_VERSION" >> $GITHUB_OUTPUT
 
       - name: Set up JDK version according to pom.xml
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version: ${{ steps.get_java_version.outputs.java_version }}
           distribution: 'corretto'
@@ -56,10 +79,10 @@ jobs:
         run: cd api && mvn -B package -DskipTests -Denvfile.skip=true
 
     #   - name: Set up Docker Buildx
-    #     uses: docker/setup-buildx-action@v3
+    #     uses: docker/setup-buildx-action@v4
 
     #   - name: Log in to the Container registry
-    #     uses: docker/login-action@v3
+    #     uses: docker/login-action@v4
     #     with:
     #       registry: ghcr.io
     #       username: ${{ github.actor }}
@@ -67,7 +90,7 @@ jobs:
 
     #   - name: Extract metadata (tags, labels) for Docker
     #     id: meta
-    #     uses: docker/metadata-action@v5
+    #     uses: docker/metadata-action@v6
     #     with:
     #       images: ghcr.io/${{ github.repository }}-api
     #       tags: |
@@ -77,7 +100,7 @@ jobs:
     #         type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
 
     #   - name: Build and push Docker image
-    #     uses: docker/build-push-action@v6
+    #     uses: docker/build-push-action@v7
     #     with:
     #       context: api
     #       file: api/Dockerfile.fly
@@ -89,7 +112,7 @@ jobs:
 
       # Run deployment script
       - name: Install Fly CLI
-        uses: superfly/flyctl-actions/setup-flyctl@master
+        uses: superfly/flyctl-actions/setup-flyctl@ed8efb33836e8b2096c7fd3ba1c8afe303ebbff1 # master (node24); latest release 1.5 still uses deprecated node20
       
       - name: Run API deployment script
         run: |
@@ -100,7 +123,8 @@ jobs:
   deploy-terraform:
     name: Deploy Infrastructure
     runs-on: ubuntu-latest
-    if: ${{ success() && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.modified, 'deploy/terraform/') || contains(github.event.head_commit.added, 'deploy/terraform/')) }}
+    needs: changes
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.terraform == 'true' }}
     environment: ${{ inputs.environment || 'production' }}
     permissions:
       contents: read
@@ -108,7 +132,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       
       - name: Get Terraform version
         id: get_tf_version
@@ -117,7 +141,7 @@ jobs:
           manifest_path: deploy/terraform/manifests/dns/providers.tf
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: ${{ steps.get_tf_version.outputs.terraform_version }}
       
@@ -132,7 +156,7 @@ jobs:
           echo "DEPLOY_ENV=$DEPLOY_ENV"
       
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-access-key-id: ${{ vars.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

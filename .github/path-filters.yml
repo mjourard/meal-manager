@@ -1,0 +1,9 @@
+# Shared change-detection filters for dorny/paths-filter, used by lint.yml, test.yml and deploy.yml.
+api:
+  - 'api/**'
+client:
+  - 'client/**'
+terraform:
+  - 'deploy/terraform/**'
+  - '.github/actions/get-terraform-version/**'
+  - '.github/actions/terraform-env-setup/**'

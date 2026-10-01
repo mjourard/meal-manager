@@ -1,0 +1,83 @@
+name: Functional Tests
+
+# Black-box API contract tests (docs/FUNCTIONAL_TESTS_PLAN.md) run against a containerized API.
+# No path filters on purpose: every merge to main runs the full suite.
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      impl:
+        description: 'API implementation to test'
+        required: true
+        default: 'go'
+        type: choice
+        options:
+          - go
+          - java
+  workflow_call:
+    inputs:
+      impl:
+        description: 'API implementation to test (go or java)'
+        required: false
+        default: 'go'
+        type: string
+
+concurrency:
+  group: functional-tests-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  functional-tests:
+    name: Functional tests (${{ inputs.impl || 'go' }} API)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      IMPL: ${{ inputs.impl || 'go' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      # The suite and the Go API land after this workflow; skip visibly rather than fail every merge until then.
+      - name: Check suite and implementation are present
+        id: presence
+        run: |
+          case "$IMPL" in
+            go)   impl_marker="api-go/go.mod" ;;
+            java) impl_marker="api/pom.xml" ;;
+            *)    echo "::error::Unknown IMPL '$IMPL'; expected 'go' or 'java'"; exit 1 ;;
+          esac
+          missing=()
+          [ -f functional-tests/go.mod ] || missing+=("functional-tests/go.mod")
+          [ -f "$impl_marker" ] || missing+=("$impl_marker")
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::warning title=Functional tests skipped::Missing ${missing[*]}; the suite will run automatically once these exist."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Go
+        if: steps.presence.outputs.ready == 'true'
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: functional-tests/go.mod
+          cache-dependency-path: functional-tests/go.sum
+
+      - name: Run functional tests
+        if: steps.presence.outputs.ready == 'true'
+        working-directory: functional-tests
+        run: make functional IMPL="$IMPL"
+
+      - name: Upload test output and API logs
+        if: failure() && steps.presence.outputs.ready == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: functional-tests-${{ env.IMPL }}-${{ github.run_id }}
+          path: functional-tests/out/
+          if-no-files-found: warn
+          retention-days: 14

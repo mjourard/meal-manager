@@ -14,6 +14,10 @@ On each commit to the main branch, it should do the following:
 2. if there were any changes to the `api` directory, run the `fly-deploy.sh` script in the deploy/scripts folder
 3. if there were any changes in the `deploy/terraform` directory, then `terraform apply` should be run
 
+Change detection for lint, test and deploy jobs lives in `.github/path-filters.yml` and is evaluated by `dorny/paths-filter` against the full push or PR diff. Manual (`workflow_dispatch`) runs skip the filter and run every job.
+
+On every pull request to main and every merge to main, `functional-tests.yml` runs the black-box API contract suite in `functional-tests/` against a containerized API (see `docs/FUNCTIONAL_TESTS_PLAN.md`). It runs with no path filters, and it skips with a warning annotation until the suite and the Go API (`api-go/`) exist.
+
 The above rules should also be available to be followed through a 'manually triggered' workflow as well. 
 They should reuse the same workflow as much as possible to promote DRY workflow file definitions.
 

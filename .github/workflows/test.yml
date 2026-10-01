@@ -9,10 +9,33 @@ on:
   workflow_dispatch:
 
 jobs:
+  changes:
+    name: Detect changed paths
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      api: ${{ steps.filter.outputs.api }}
+      client: ${{ steps.filter.outputs.client }}
+      terraform: ${{ steps.filter.outputs.terraform }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      # Diffs the whole push/PR (not just the head commit) against .github/path-filters.yml
+      - name: Filter changed paths
+        id: filter
+        if: github.event_name != 'workflow_dispatch'
+        uses: dorny/paths-filter@v4
+        with:
+          filters: .github/path-filters.yml
+
   test-api:
     name: Test API (Java)
     runs-on: ubuntu-latest
-    if: ${{ always() && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.modified, 'api/') || contains(github.event.head_commit.added, 'api/')) }}
+    needs: changes
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.api == 'true' }}
     
     services:
       postgres:
@@ -31,7 +54,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Read Java version from pom.xml
         id: get_java_version
@@ -40,7 +63,7 @@ jobs:
           echo "java_version=$JAVA_VERSION" >> $GITHUB_OUTPUT
 
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version: ${{ steps.get_java_version.outputs.java_version }}
           distribution: 'corretto'
@@ -61,14 +84,15 @@ jobs:
   test-client:
     name: Test Client (TypeScript)
     runs-on: ubuntu-latest
-    if: ${{ always() && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.modified, 'client/') || contains(github.event.head_commit.added, 'client/')) }}
+    needs: changes
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.client == 'true' }}
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version-file: client/package.json
           cache: 'npm'
